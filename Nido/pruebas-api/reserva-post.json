@@ -6,5 +6,5 @@
   "moneda": "PEN",
   "estado": "CONFIRMADA",
   "alojamiento": { "idAlojamiento": 6 },
-  "huesped": { "idHuesped": 1 }
+  "huesped": { "idHuesped": 8 }
 }
