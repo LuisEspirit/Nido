@@ -1,0 +1,10 @@
+{
+  "nombre": "Departamento Barranco",
+  "direccion": "Jr. Domeyer 250",
+  "latitud": -12.1405,
+  "longitud": -77.0219,
+  "capacidad": 3,
+  "precioBase": 120.0,
+  "estado": "ACTIVO",
+  "propietario": { "idusuario": 6 }
+}
