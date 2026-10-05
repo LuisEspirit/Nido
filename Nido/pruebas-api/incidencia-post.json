@@ -1,0 +1,8 @@
+{
+  "categoria": "MANTENIMIENTO",
+  "prioridad": "ALTA",
+  "descripcion": "La ducha del baño principal no tiene agua caliente.",
+  "estado": "ABIERTA",
+  "alojamiento": { "idAlojamiento": 6 },
+  "reserva": { "idReserva": 1 }
+}
