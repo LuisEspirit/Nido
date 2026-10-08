@@ -5,6 +5,8 @@
   "longitud": -77.0219,
   "capacidad": 3,
   "precioBase": 120.0,
-  "estado": "ACTIVO",
-  "propietario": { "idusuario": 6 }
+  "estado": "DISPONIBLE",
+  "ubigeo": {
+    "idubigeo": 2
+  }
 }

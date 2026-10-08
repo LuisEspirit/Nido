@@ -1,10 +1,13 @@
 {
   "entrada": "2026-11-10T14:00:00",
-  "salida": "2026-11-13T12:00:00",
+  "salida": "2026-11-13T11:00:00",
   "canal": "WEB",
-  "precio": 450.0,
   "moneda": "PEN",
   "estado": "CONFIRMADA",
-  "alojamiento": { "idAlojamiento": 6 },
-  "huesped": { "idHuesped": 8 }
+  "alojamiento": {
+    "idAlojamiento": 2
+  },
+  "huesped": {
+    "idHuesped": 4
+  }
 }

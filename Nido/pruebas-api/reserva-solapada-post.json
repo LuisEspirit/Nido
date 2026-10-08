@@ -1,0 +1,11 @@
+{
+  "entrada": "2026-10-11T14:00:00",
+  "salida": "2026-10-12T11:00:00",
+  "canal": "WEB",
+  "alojamiento": {
+    "idAlojamiento": 1
+  },
+  "huesped": {
+    "idHuesped": 2
+  }
+}

@@ -1,8 +1,10 @@
 {
-  "tipo": "TARJETA",
+  "tipo": "INGRESO",
   "importe": 450.0,
   "moneda": "PEN",
   "fecha": "2026-11-10T10:30:00",
   "estado": "PAGADO",
-  "reserva": { "idReserva": 7 }
+  "reserva": {
+    "idReserva": 7
+  }
 }
