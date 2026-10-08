@@ -50,4 +50,13 @@ public class AlojamientoController {
         alojamientoService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/estado/{estado}")
+    public ResponseEntity<List<Alojamiento>> buscarPorEstado(@PathVariable String estado) {
+        List<Alojamiento> lista = alojamientoService.buscarPorEstado(estado);
+        if(lista.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(lista, HttpStatus.OK);
+    }
 }
