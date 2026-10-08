@@ -1,6 +1,9 @@
 package com.hotel.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,17 +20,21 @@ public class Huesped {
     @Column(name = "idHuesped")
     private Integer idHuesped;
 
+    @NotBlank(message = "Los nombres son obligatorios")
     @Column(length = 100)
     private String nombres;
 
+    @NotBlank(message = "Los apellidos son obligatorios")
     @Column(length = 100)
     private String apellidos;
 
+    @Email(message = "El correo no tiene un formato valido")
     @Column(length = 100)
     private String correo;
 
     @Column(length = 45)
     private String telefono;
 
+    @NotNull(message = "Debe indicar si el huesped otorgo su consentimiento")
     private Boolean consentimiento;
 }

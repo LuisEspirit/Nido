@@ -1,9 +1,9 @@
 package com.hotel.repository;
 
-import com.hotel.entity.Huesped;
+import com.hotel.entity.Ubigeo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
+public interface UbigeoRepository extends JpaRepository<Ubigeo, Integer> {
 }
