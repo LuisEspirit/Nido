@@ -96,6 +96,16 @@ public class AlojamientoServiceImpl implements AlojamientoService {
         return alojamientoRepository.findByEstado(estado);
     }
 
+    /** El propietario confirma las coordenadas sugeridas antes de guardarlas (US04). */
+    @Override
+    @Transactional
+    public Alojamiento confirmarUbicacion(Integer id, Double latitud, Double longitud) {
+        Alojamiento alojamiento = obtener(id);
+        alojamiento.setLatitud(latitud);
+        alojamiento.setLongitud(longitud);
+        return alojamientoRepository.save(alojamiento);
+    }
+
     private Alojamiento obtener(Integer id) {
         Alojamiento alojamiento = alojamientoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Alojamiento", id));
