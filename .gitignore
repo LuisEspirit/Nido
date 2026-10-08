@@ -1,0 +1,18 @@
+# Compilados de Maven
+target/
+
+# Configuracion local con contrasenas (NO subir)
+application-local.properties
+
+# Archivos del IDE (Eclipse / STS / IntelliJ / VS Code)
+.classpath
+.project
+.factorypath
+.settings/
+.idea/
+*.iml
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
