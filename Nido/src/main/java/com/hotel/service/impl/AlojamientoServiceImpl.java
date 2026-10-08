@@ -58,4 +58,9 @@ public class AlojamientoServiceImpl implements AlojamientoService {
     public void deleteById(Integer id) {
         alojamientoRepository.deleteById(id);
     }
+    
+    @Override
+    public List<Alojamiento> buscarPorEstado(String estado) {
+        return alojamientoRepository.findByEstado(estado);
+    }
 }
