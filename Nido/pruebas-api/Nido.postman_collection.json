@@ -1,22 +1,22 @@
 {
   "info": {
-    "name": "Nido API",
+    "name": "Nido API - Pruebas por Historia de Usuario",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Pruebas de la API de Nido. Cargue database/bd_nido.sql, arranque la aplicacion y ejecute la coleccion completa con Runner (en orden). Todos los usuarios de prueba usan la contrasena Nido2026!"
+    "description": "Una carpeta por historia de usuario con exactamente los endpoints de su tabla en el documento. Carga database/bd_nido.sql, arranca el backend y ejecuta la colección completa con Runner (en orden). Contraseña de todos los usuarios: Nido2026!"
   },
   "item": [
     {
-      "name": "01 Autenticacion (US01)",
+      "name": "US01 - Iniciar sesión",
       "item": [
         {
-          "name": "Login ADMIN (admin)",
+          "name": "Login ADMIN",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
                   "pm.collectionVariables.set(\"tokenAdmin\", pm.response.json().token);"
                 ]
               }
@@ -35,6 +35,7 @@
                 "login"
               ]
             },
+            "description": "Inicia sesión y devuelve el token JWT con roles y opciones de menú.",
             "auth": {
               "type": "noauth"
             },
@@ -57,7 +58,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
                   "pm.collectionVariables.set(\"tokenPropietario\", pm.response.json().token);"
                 ]
               }
@@ -76,6 +77,7 @@
                 "login"
               ]
             },
+            "description": "Token del propietario Lucía Mendoza (idUsuario 2).",
             "auth": {
               "type": "noauth"
             },
@@ -98,7 +100,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
                   "pm.collectionVariables.set(\"tokenPropietario2\", pm.response.json().token);"
                 ]
               }
@@ -117,6 +119,7 @@
                 "login"
               ]
             },
+            "description": "Token del propietario Jorge Quispe (idUsuario 3).",
             "auth": {
               "type": "noauth"
             },
@@ -139,7 +142,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
                   "pm.collectionVariables.set(\"tokenPersonal\", pm.response.json().token);"
                 ]
               }
@@ -158,6 +161,7 @@
                 "login"
               ]
             },
+            "description": "Token del personal Rosa Huamán (idUsuario 4).",
             "auth": {
               "type": "noauth"
             },
@@ -180,7 +184,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
                   "pm.collectionVariables.set(\"tokenPersonal2\", pm.response.json().token);"
                 ]
               }
@@ -199,6 +203,7 @@
                 "login"
               ]
             },
+            "description": "Token del personal Carlos Flores (idUsuario 5).",
             "auth": {
               "type": "noauth"
             },
@@ -214,15 +219,15 @@
           }
         },
         {
-          "name": "Login con contrasena incorrecta",
+          "name": "Login con contraseña incorrecta",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 401\", function () { pm.response.to.have.status(401); });",
-                  "pm.test(\"Devuelve un mensaje de error\", function () { pm.expect(pm.response.json().mensaje).to.be.a(\"string\"); });"
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
@@ -240,12 +245,13 @@
                 "login"
               ]
             },
+            "description": "Mensaje genérico, no revela qué dato falló.",
             "auth": {
               "type": "noauth"
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"admin\",\n  \"password\": \"otra\"\n}",
+              "raw": "{\n  \"login\": \"admin\",\n  \"password\": \"otra-clave\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -255,14 +261,15 @@
           }
         },
         {
-          "name": "Login de usuario INACTIVO (mtorres)",
+          "name": "Login de usuario INACTIVO",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 401\", function () { pm.response.to.have.status(401); });"
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
@@ -280,6 +287,7 @@
                 "login"
               ]
             },
+            "description": "Un usuario desactivado no puede ingresar.",
             "auth": {
               "type": "noauth"
             },
@@ -295,14 +303,14 @@
           }
         },
         {
-          "name": "Perfil y menu del usuario",
+          "name": "Perfil y menú del usuario",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -320,6 +328,432 @@
                 "perfil"
               ]
             },
+            "description": "Datos del usuario autenticado y opciones de su rol.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US02 - Usuarios y roles",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "Lista de usuarios con sus roles (solo ADMIN).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar usuario con rol",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idUsuarioNuevo\", pm.response.json().idusuario);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "Contraseña cifrada con BCrypt; requiere al menos un rol.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Rios Paz\",\n  \"dni\": \"70000020\",\n  \"login\": \"arios\",\n  \"password\": \"Clave2026!\",\n  \"correo\": \"ana.rios@nido.pe\",\n  \"roles\": [\n    {\n      \"nombre\": \"PROPIETARIO\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{idUsuarioNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{idUsuarioNuevo}}"
+              ]
+            },
+            "description": "Consulta un usuario por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{idUsuarioNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{idUsuarioNuevo}}"
+              ]
+            },
+            "description": "Si no se envía password se conserva la actual.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Ana Lucia\",\n  \"apellidos\": \"Rios Paz\",\n  \"dni\": \"70000020\",\n  \"login\": \"arios\",\n  \"correo\": \"ana.rios@nido.pe\",\n  \"roles\": [\n    {\n      \"idrol\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desactivar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{idUsuarioNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{idUsuarioNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "Un usuario INACTIVO no puede iniciar sesión.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"INACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{idUsuarioNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{idUsuarioNuevo}}"
+              ]
+            },
+            "description": "Elimina el usuario creado en la prueba.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            },
+            "description": "Roles ADMIN, PROPIETARIO, PERSONAL y los previstos para sprints futuros.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar opciones de menú",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/opciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "opciones"
+              ]
+            },
+            "description": "Opciones que cada rol ve en su menú.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Propietario no administra usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "Control de acceso por rol (RBAC).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US03 - Gestión de alojamientos",
+      "item": [
+        {
+          "name": "Listar alojamientos del propietario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Solo alojamientos de lmendoza\", () => pm.response.json().forEach(a => pm.expect(a.propietario.login).to.eql(\"lmendoza\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alojamientos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alojamientos"
+              ]
+            },
+            "description": "Cada propietario ve solo los suyos (admin ve todos).",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -333,20 +767,21 @@
           }
         },
         {
-          "name": "Sin token",
+          "name": "Registrar alojamiento",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 401\", function () { pm.response.to.have.status(401); });"
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idAlojamientoNuevo\", pm.response.json().idAlojamiento);"
                 ]
               }
             }
           ],
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/alojamientos",
@@ -357,26 +792,37 @@
                 "alojamientos"
               ]
             },
+            "description": "El propietario queda como dueño; idUsuario = quien registra.",
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"nombre\": \"Departamento Barranco Bohemio\",\n  \"direccion\": \"Jr. Domeyer 250, Barranco\",\n  \"latitud\": -12.1405,\n  \"longitud\": -77.0219,\n  \"capacidad\": 3,\n  \"precioBase\": 120.0,\n  \"estado\": \"DISPONIBLE\",\n  \"ubigeo\": {\n    \"idubigeo\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "02 Alojamientos (HU-01, US03)",
-      "item": [
+        },
         {
-          "name": "Listar (propietario ve solo los suyos)",
+          "name": "Obtener alojamiento",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"Solo alojamientos de lmendoza\", function () { pm.response.json().forEach(a => pm.expect(a.propietario.login).to.eql(\"lmendoza\")); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -385,14 +831,143 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/alojamientos",
+              "raw": "{{baseUrl}}/alojamientos/{{idAlojamientoNuevo}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "alojamientos"
+                "alojamientos",
+                "{{idAlojamientoNuevo}}"
               ]
             },
+            "description": "Consulta por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar alojamiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alojamientos/{{idAlojamientoNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alojamientos",
+                "{{idAlojamientoNuevo}}"
+              ]
+            },
+            "description": "Actualiza capacidad y precio.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Departamento Barranco Bohemio\",\n  \"direccion\": \"Jr. Domeyer 250, Barranco\",\n  \"latitud\": -12.1405,\n  \"longitud\": -77.0219,\n  \"capacidad\": 4,\n  \"precioBase\": 135.0,\n  \"estado\": \"DISPONIBLE\",\n  \"ubigeo\": {\n    \"idubigeo\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Buscar por estado (HU-01)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alojamientos/estado/DISPONIBLE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alojamientos",
+                "estado",
+                "DISPONIBLE"
+              ]
+            },
+            "description": "Búsqueda de alojamientos por estado.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar alojamiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alojamientos/{{idAlojamientoNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alojamientos",
+                "{{idAlojamientoNuevo}}"
+              ]
+            },
+            "description": "Elimina un alojamiento sin reservas.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -413,7 +988,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                  "pm.test(\"Responde 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
@@ -431,6 +1007,7 @@
                 "3"
               ]
             },
+            "description": "Aislamiento entre propietarios.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -451,8 +1028,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });",
-                  "pm.test(\"Devuelve un mensaje de error\", function () { pm.expect(pm.response.json().mensaje).to.be.a(\"string\"); });"
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
@@ -461,15 +1038,16 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/alojamientos/999",
+              "raw": "{{baseUrl}}/alojamientos/9999",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "alojamientos",
-                "999"
+                "9999"
               ]
             },
+            "description": "Mensaje de error en JSON.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -483,15 +1061,15 @@
           }
         },
         {
-          "name": "Crear alojamiento",
+          "name": "Registrar sin nombre",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set(\"idAlojamientoNuevo\", pm.response.json().idAlojamiento);"
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
@@ -508,6 +1086,7 @@
                 "alojamientos"
               ]
             },
+            "description": "Validación de datos obligatorios.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -520,114 +1099,215 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Departamento Barranco\",\n  \"direccion\": \"Jr. Domeyer 250\",\n  \"latitud\": -12.1405,\n  \"longitud\": -77.0219,\n  \"capacidad\": 3,\n  \"precioBase\": 120.0,\n  \"estado\": \"DISPONIBLE\",\n  \"ubigeo\": {\n    \"idubigeo\": 2\n  }\n}\n",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"direccion\": \"Av. Pardo 10\",\n  \"capacidad\": 2\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
-          }
-        },
-        {
-          "name": "Crear alojamiento sin nombre",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/alojamientos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "alojamientos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"direccion\": \"Av. Pardo 10\",\n  \"capacidad\": 2\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Buscar por estado",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/alojamientos/estado/DISPONIBLE",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "alojamientos",
-                "estado",
-                "DISPONIBLE"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
             }
           }
         }
       ]
     },
     {
-      "name": "03 Huespedes",
+      "name": "US04 - Ubicación del alojamiento",
       "item": [
         {
-          "name": "Crear huesped",
+          "name": "Geocodificar dirección (OpenStreetMap)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/geocodificacion?direccion=Malecon de la Reserva 610, Miraflores, Lima",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "geocodificacion"
+              ],
+              "query": [
+                {
+                  "key": "direccion",
+                  "value": "Malecon de la Reserva 610, Miraflores, Lima"
+                }
+              ]
+            },
+            "description": "API externa Nominatim: sugiere latitud y longitud.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Confirmar ubicación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alojamientos/1/ubicacion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alojamientos",
+                "1",
+                "ubicacion"
+              ]
+            },
+            "description": "El propietario confirma las coordenadas antes de guardarlas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitud\": -12.1316676,\n  \"longitud\": -77.0309293\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Coordenadas fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alojamientos/1/ubicacion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alojamientos",
+                "1",
+                "ubicacion"
+              ]
+            },
+            "description": "Latitud entre -90 y 90; longitud entre -180 y 180.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitud\": -120,\n  \"longitud\": -77\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US05 - Gestión de huéspedes",
+      "item": [
+        {
+          "name": "Listar huéspedes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/huespedes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "huespedes"
+              ]
+            },
+            "description": "Huéspedes registrados.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar huésped",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
                   "pm.collectionVariables.set(\"idHuespedNuevo\", pm.response.json().idHuesped);"
                 ]
               }
@@ -645,6 +1325,7 @@
                 "huespedes"
               ]
             },
+            "description": "Requiere consentimiento y el idUsuario que registra.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -657,7 +1338,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombres\": \"María\",\n  \"apellidos\": \"Quispe Torres\",\n  \"correo\": \"maria.quispe@correo.com\",\n  \"telefono\": \"987654321\",\n  \"consentimiento\": true\n}\n",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"nombres\": \"María\",\n  \"apellidos\": \"Quispe Torres\",\n  \"correo\": \"maria.quispe@correo.com\",\n  \"telefono\": \"987654321\",\n  \"consentimiento\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -667,14 +1348,141 @@
           }
         },
         {
-          "name": "Crear huesped sin consentimiento",
+          "name": "Obtener huésped",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/huespedes/{{idHuespedNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "huespedes",
+                "{{idHuespedNuevo}}"
+              ]
+            },
+            "description": "Consulta por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar huésped",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/huespedes/{{idHuespedNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "huespedes",
+                "{{idHuespedNuevo}}"
+              ]
+            },
+            "description": "Actualiza el teléfono.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"María\",\n  \"apellidos\": \"Quispe Torres\",\n  \"correo\": \"maria.quispe@correo.com\",\n  \"telefono\": \"912345678\",\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar huésped",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/huespedes/{{idHuespedNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "huespedes",
+                "{{idHuespedNuevo}}"
+              ]
+            },
+            "description": "Elimina un huésped sin reservas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registro sin idUsuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
@@ -691,6 +1499,7 @@
                 "huespedes"
               ]
             },
+            "description": "El idUsuario (quien registra) es obligatorio.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -703,7 +1512,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombres\": \"A\",\n  \"apellidos\": \"B\"\n}",
+              "raw": "{\n  \"nombres\": \"A\",\n  \"apellidos\": \"B\",\n  \"consentimiento\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -713,20 +1522,21 @@
           }
         },
         {
-          "name": "Listar huespedes",
+          "name": "Registro con idUsuario de otro usuario",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Responde 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
                 ]
               }
             }
           ],
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/huespedes",
@@ -737,6 +1547,59 @@
                 "huespedes"
               ]
             },
+            "description": "No se puede registrar a nombre de otro usuario.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 3,\n  \"nombres\": \"A\",\n  \"apellidos\": \"B\",\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US06 - Registrar reserva",
+      "item": [
+        {
+          "name": "Listar reservas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            },
+            "description": "Reservas de los alojamientos del propietario.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -748,22 +1611,18 @@
               ]
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "04 Reservas (US07)",
-      "item": [
+        },
         {
-          "name": "CP09 - Reserva solapada",
+          "name": "Registrar reserva",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });",
-                  "pm.test(\"Devuelve un mensaje de error\", function () { pm.expect(pm.response.json().mensaje).to.be.a(\"string\"); });"
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idReservaNueva\", pm.response.json().idReserva);",
+                  "pm.test(\"Precio calculado: 3 noches x 140\", () => pm.expect(pm.response.json().precio).to.eql(420));"
                 ]
               }
             }
@@ -780,6 +1639,7 @@
                 "reservas"
               ]
             },
+            "description": "Sin precio: se calcula noches x precio base.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -792,7 +1652,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"entrada\": \"2026-10-11T14:00:00\",\n  \"salida\": \"2026-10-12T11:00:00\",\n  \"canal\": \"WEB\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"huesped\": {\n    \"idHuesped\": 2\n  }\n}\n",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"entrada\": \"2026-11-10T14:00:00\",\n  \"salida\": \"2026-11-13T11:00:00\",\n  \"canal\": \"WEB\",\n  \"moneda\": \"PEN\",\n  \"estado\": \"CONFIRMADA\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 2\n  },\n  \"huesped\": {\n    \"idHuesped\": 4\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -802,15 +1662,331 @@
           }
         },
         {
-          "name": "Consultar disponibilidad (ocupado)",
+          "name": "Obtener reserva",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"No disponible\", function () { pm.expect(pm.response.json().disponible).to.eql(false); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/{{idReservaNueva}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{idReservaNueva}}"
+              ]
+            },
+            "description": "Consulta por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/{{idReservaNueva}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{idReservaNueva}}"
+              ]
+            },
+            "description": "Cambia canal y precio sin chocar consigo misma.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entrada\": \"2026-11-10T14:00:00\",\n  \"salida\": \"2026-11-13T11:00:00\",\n  \"canal\": \"DIRECTO\",\n  \"precio\": 400.0,\n  \"moneda\": \"PEN\",\n  \"estado\": \"CONFIRMADA\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 2\n  },\n  \"huesped\": {\n    \"idHuesped\": 4\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cancelar reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda CANCELADA\", () => pm.expect(pm.response.json().estado).to.eql(\"CANCELADA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/{{idReservaNueva}}/cancelar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{idReservaNueva}}",
+                "cancelar"
+              ]
+            },
+            "description": "Cancelar libera las fechas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/{{idReservaNueva}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas",
+                "{{idReservaNueva}}"
+              ]
+            },
+            "description": "Elimina una reserva sin pagos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Salida antes de la entrada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            },
+            "description": "Validación de fechas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"entrada\": \"2026-12-10T14:00:00\",\n  \"salida\": \"2026-12-09T11:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"huesped\": {\n    \"idHuesped\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Alojamiento INACTIVO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            },
+            "description": "Un alojamiento INACTIVO no acepta reservas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"entrada\": \"2026-12-10T14:00:00\",\n  \"salida\": \"2026-12-12T11:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 5\n  },\n  \"huesped\": {\n    \"idHuesped\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US07 - Evitar solapamiento de reservas",
+      "item": [
+        {
+          "name": "CP09 Reserva solapada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            },
+            "description": "Rechaza la reserva e identifica la reserva en conflicto.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"entrada\": \"2026-10-11T14:00:00\",\n  \"salida\": \"2026-10-12T11:00:00\",\n  \"canal\": \"WEB\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"huesped\": {\n    \"idHuesped\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Disponibilidad: fechas ocupadas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"No disponible\", () => pm.expect(pm.response.json().disponible).to.eql(false));"
                 ]
               }
             }
@@ -842,6 +2018,7 @@
                 }
               ]
             },
+            "description": "Lista los conflictos.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -855,154 +2032,15 @@
           }
         },
         {
-          "name": "Crear reserva",
+          "name": "Disponibilidad: fechas libres",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set(\"idReservaNueva\", pm.response.json().idReserva);",
-                  "pm.test(\"Precio calculado por noches\", function () { pm.expect(pm.response.json().precio).to.eql(420); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/reservas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reservas"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"entrada\": \"2026-11-10T14:00:00\",\n  \"salida\": \"2026-11-13T11:00:00\",\n  \"canal\": \"WEB\",\n  \"moneda\": \"PEN\",\n  \"estado\": \"CONFIRMADA\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 2\n  },\n  \"huesped\": {\n    \"idHuesped\": 4\n  }\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Salida antes de la entrada",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/reservas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reservas"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"entrada\": \"2026-12-10T14:00:00\",\n  \"salida\": \"2026-12-09T11:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"huesped\": {\n    \"idHuesped\": 2\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Alojamiento INACTIVO",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/reservas",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reservas"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"entrada\": \"2026-12-10T14:00:00\",\n  \"salida\": \"2026-12-12T11:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 5\n  },\n  \"huesped\": {\n    \"idHuesped\": 2\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Reservas del alojamiento 1",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Disponible\", () => pm.expect(pm.response.json().disponible).to.eql(true));"
                 ]
               }
             }
@@ -1011,1535 +2049,36 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reservas/alojamiento/1",
+              "raw": "{{baseUrl}}/reservas/disponibilidad?idAlojamiento=1&entrada=2026-12-01T14:00:00&salida=2026-12-03T11:00:00",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "reservas",
-                "alojamiento",
-                "1"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Cancelar reserva",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"Queda CANCELADA\", function () { pm.expect(pm.response.json().estado).to.eql(\"CANCELADA\"); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/reservas/{{idReservaNueva}}/cancelar",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reservas",
-                "{{idReservaNueva}}",
-                "cancelar"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "05 Pagos",
-      "item": [
-        {
-          "name": "Registrar pago",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/pagos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "pagos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario2}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tipo\": \"INGRESO\",\n  \"importe\": 450.0,\n  \"moneda\": \"PEN\",\n  \"fecha\": \"2026-11-10T10:30:00\",\n  \"estado\": \"PAGADO\",\n  \"reserva\": {\n    \"idReserva\": 7\n  }\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Tipo de pago invalido",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/pagos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "pagos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tipo\": \"TARJETA\",\n  \"importe\": 100,\n  \"reserva\": {\n    \"idReserva\": 1\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Pago de reserva ajena",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/pagos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "pagos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"importe\": 100,\n  \"reserva\": {\n    \"idReserva\": 4\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "06 Servicios, checklist y evidencias (US10, US11, US12)",
-      "item": [
-        {
-          "name": "Asignar a personal INACTIVO",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tipo\": \"LIMPIEZA\",\n  \"inicio\": \"2026-10-13T12:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"usuario\": {\n    \"idusuario\": 6\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Crear servicio de limpieza",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set(\"idServicioNuevo\", pm.response.json().idServicio);"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"tipo\": \"LIMPIEZA\",\n  \"inicio\": \"2026-10-13T12:00:00\",\n  \"fin\": \"2026-10-13T15:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"reserva\": {\n    \"idReserva\": 1\n  },\n  \"usuario\": {\n    \"idusuario\": 4\n  }\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Mis servicios (personal)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/mis-servicios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "mis-servicios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Otro personal no ve el servicio",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal2}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Aceptar servicio",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"ACEPTADO\"\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Iniciar servicio",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"EN_PROCESO\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Completar sin checklist",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });",
-                  "pm.test(\"Devuelve un mensaje de error\", function () { pm.expect(pm.response.json().mensaje).to.be.a(\"string\"); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Marcar checklist",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/checklist",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "checklist"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "[\n  {\n    \"item\": \"Cambiar sabanas y toallas\",\n    \"hecho\": true\n  },\n  {\n    \"item\": \"Limpiar bano y cocina\",\n    \"hecho\": true\n  },\n  {\n    \"item\": \"Barrer y trapear pisos\",\n    \"hecho\": true\n  }\n]\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Completar sin foto",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });",
-                  "pm.test(\"Devuelve un mensaje de error\", function () { pm.expect(pm.response.json().mensaje).to.be.a(\"string\"); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Subir foto de evidencia",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set(\"idEvidencia\", pm.response.json().idEvidencia);"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/evidencias",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "evidencias"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "archivo",
-                  "type": "file",
-                  "src": "evidencia-ejemplo.png"
-                }
-              ]
-            },
-            "description": "En Postman seleccione el archivo pruebas-api/evidencia-ejemplo.png (o cualquier foto JPG/PNG) en el campo 'archivo'."
-          }
-        },
-        {
-          "name": "Listar evidencias",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/evidencias",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "evidencias"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Ver foto",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/evidencias/{{idEvidencia}}/archivo",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "evidencias",
-                "{{idEvidencia}}",
-                "archivo"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Completar servicio",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "servicios",
-                "{{idServicioNuevo}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "07 Incidencias",
-      "item": [
-        {
-          "name": "Personal reporta incidencia",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set(\"idIncidencia\", pm.response.json().idIncidencia);"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/incidencias",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "incidencias"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPersonal}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"categoria\": \"MANTENIMIENTO\",\n  \"prioridad\": \"ALTA\",\n  \"descripcion\": \"La ducha del baño principal no tiene agua caliente.\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"reserva\": {\n    \"idReserva\": 1\n  }\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Prioridad invalida",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/incidencias",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "incidencias"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"categoria\": \"OTRO\",\n  \"prioridad\": \"URGENTE\",\n  \"descripcion\": \"x\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Filtrar incidencias abiertas",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/incidencias?estado=ABIERTA",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "incidencias"
+                "disponibilidad"
               ],
               "query": [
                 {
-                  "key": "estado",
-                  "value": "ABIERTA"
+                  "key": "idAlojamiento",
+                  "value": "1"
+                },
+                {
+                  "key": "entrada",
+                  "value": "2026-12-01T14:00:00"
+                },
+                {
+                  "key": "salida",
+                  "value": "2026-12-03T11:00:00"
                 }
               ]
             },
+            "description": "Sin conflictos.",
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
                   "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Resolver incidencia",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/incidencias/{{idIncidencia}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "incidencias",
-                "{{idIncidencia}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"RESUELTA\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "08 Usuarios y personal (US02, US09)",
-      "item": [
-        {
-          "name": "Listar usuarios (admin)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenAdmin}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Listar usuarios (propietario: prohibido)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Crear usuario propietario",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenAdmin}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Rios Paz\",\n  \"dni\": \"70000010\",\n  \"login\": \"arios\",\n  \"password\": \"Clave2026!\",\n  \"correo\": \"ana.rios@nido.pe\",\n  \"roles\": [\n    {\n      \"nombre\": \"PROPIETARIO\"\n    }\n  ]\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Login repetido",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenAdmin}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Rios Paz\",\n  \"dni\": \"70000010\",\n  \"login\": \"arios\",\n  \"password\": \"Clave2026!\",\n  \"correo\": \"ana.rios@nido.pe\",\n  \"roles\": [\n    {\n      \"nombre\": \"PROPIETARIO\"\n    }\n  ]\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Personal activo",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/personal?soloActivos=true",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios",
-                "personal"
-              ],
-              "query": [
-                {
-                  "key": "soloActivos",
-                  "value": "true"
-                }
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Registrar personal",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
-                  "pm.collectionVariables.set(\"idPersonalNuevo\", pm.response.json().idusuario);"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/personal",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios",
-                "personal"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombres\": \"Pablo\",\n  \"apellidos\": \"Diaz Rojas\",\n  \"dni\": \"70000011\",\n  \"login\": \"pdiaz\",\n  \"password\": \"Clave2026!\",\n  \"correo\": \"pablo@nido.pe\",\n  \"especialidad\": \"LIMPIEZA\"\n}\n",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Desactivar personal",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/usuarios/personal/{{idPersonalNuevo}}/estado",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "usuarios",
-                "personal",
-                "{{idPersonalNuevo}}",
-                "estado"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"estado\": \"INACTIVO\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "09 Catalogos",
-      "item": [
-        {
-          "name": "Ubigeos",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/ubigeos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "ubigeos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Paises",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/paises",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "paises"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Catalogos",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/catalogos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "catalogos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Datos de catalogo",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/datacatalogos",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "datacatalogos"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Crear pais (propietario: prohibido)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/paises",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "paises"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenPropietario}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"iso\": \"FR\",\n  \"nombre\": \"Francia\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Roles (admin)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/roles",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "roles"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenAdmin}}",
                   "type": "string"
                 }
               ]
@@ -2549,17 +2088,17 @@
       ]
     },
     {
-      "name": "10 Reportes (US08, US14, US15)",
+      "name": "US08 - Calendario operativo",
       "item": [
         {
-          "name": "Ingresos del mes",
+          "name": "Calendario del mes",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -2568,13 +2107,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reportes/ingresos?fechaInicio=2026-10-01&fechaFin=2026-10-31",
+              "raw": "{{baseUrl}}/reportes/calendario?fechaInicio=2026-10-01&fechaFin=2026-10-31",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "reportes",
-                "ingresos"
+                "calendario"
               ],
               "query": [
                 {
@@ -2587,12 +2126,13 @@
                 }
               ]
             },
+            "description": "Reservas y servicios del periodo.",
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenAdmin}}",
+                  "value": "{{tokenPropietario}}",
                   "type": "string"
                 }
               ]
@@ -2600,62 +2140,14 @@
           }
         },
         {
-          "name": "Ocupacion del mes",
+          "name": "Calendario de un alojamiento",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/reportes/ocupacion?fechaInicio=2026-10-01&fechaFin=2026-10-31",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "reportes",
-                "ocupacion"
-              ],
-              "query": [
-                {
-                  "key": "fechaInicio",
-                  "value": "2026-10-01"
-                },
-                {
-                  "key": "fechaFin",
-                  "value": "2026-10-31"
-                }
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenAdmin}}",
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Calendario del alojamiento 1",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -2687,6 +2179,7 @@
                 }
               ]
             },
+            "description": "Filtro por alojamiento.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2700,14 +2193,14 @@
           }
         },
         {
-          "name": "Reporte de operacion",
+          "name": "Reservas de un alojamiento",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -2716,46 +2209,44 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reportes/operacion?fechaInicio=2026-09-01&fechaFin=2026-10-31",
+              "raw": "{{baseUrl}}/reservas/alojamiento/1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "reportes",
-                "operacion"
-              ],
-              "query": [
-                {
-                  "key": "fechaInicio",
-                  "value": "2026-09-01"
-                },
-                {
-                  "key": "fechaFin",
-                  "value": "2026-10-31"
-                }
+                "reservas",
+                "alojamiento",
+                "1"
               ]
             },
+            "description": "Llegadas y salidas ordenadas por fecha.",
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenAdmin}}",
+                  "value": "{{tokenPropietario}}",
                   "type": "string"
                 }
               ]
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "US09 - Gestión de personal",
+      "item": [
         {
-          "name": "Periodo invertido",
+          "name": "Listar personal activo",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ningun INACTIVO\", () => pm.response.json().forEach(p => pm.expect(p.estado).to.eql(\"ACTIVO\")));"
                 ]
               }
             }
@@ -2764,31 +2255,28 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/reportes/ocupacion?fechaInicio=2026-10-31&fechaFin=2026-10-01",
+              "raw": "{{baseUrl}}/usuarios/personal?soloActivos=true",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "reportes",
-                "ocupacion"
+                "usuarios",
+                "personal"
               ],
               "query": [
                 {
-                  "key": "fechaInicio",
-                  "value": "2026-10-31"
-                },
-                {
-                  "key": "fechaFin",
-                  "value": "2026-10-01"
+                  "key": "soloActivos",
+                  "value": "true"
                 }
               ]
             },
+            "description": "El personal inactivo no aparece como asignable.",
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenAdmin}}",
+                  "value": "{{tokenPropietario}}",
                   "type": "string"
                 }
               ]
@@ -2796,14 +2284,1362 @@
           }
         },
         {
-          "name": "Personal no ve reportes",
+          "name": "Registrar personal",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idPersonalNuevo\", pm.response.json().idusuario);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/personal",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "personal"
+              ]
+            },
+            "description": "Se registra con el rol PERSONAL.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Pablo\",\n  \"apellidos\": \"Diaz Rojas\",\n  \"dni\": \"70000021\",\n  \"login\": \"pdiaz\",\n  \"password\": \"Clave2026!\",\n  \"correo\": \"pablo@nido.pe\",\n  \"especialidad\": \"LIMPIEZA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desactivar personal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/personal/{{idPersonalNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "personal",
+                "{{idPersonalNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "Deja de ser asignable y no puede iniciar sesión.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"INACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Asignar servicio a personal INACTIVO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios"
+              ]
+            },
+            "description": "Regla: solo se asigna personal ACTIVO.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"tipo\": \"LIMPIEZA\",\n  \"inicio\": \"2026-10-15T12:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"personal\": {\n    \"idusuario\": 6\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US10 - Crear y asignar servicio",
+      "item": [
+        {
+          "name": "Crear y asignar servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idServicioNuevo\", pm.response.json().idServicio);",
+                  "pm.test(\"Queda ASIGNADO con checklist\", () => { const s = pm.response.json(); pm.expect(s.estado).to.eql(\"ASIGNADO\"); pm.expect(JSON.parse(s.checklist).length).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios"
+              ]
+            },
+            "description": "Queda ASIGNADO con el checklist base del tipo.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"tipo\": \"LIMPIEZA\",\n  \"inicio\": \"2026-10-13T12:00:00\",\n  \"fin\": \"2026-10-13T15:00:00\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"reserva\": {\n    \"idReserva\": 1\n  },\n  \"personal\": {\n    \"idusuario\": 4\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar servicios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios"
+              ]
+            },
+            "description": "Servicios de los alojamientos del propietario.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}"
+              ]
+            },
+            "description": "Consulta por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mis servicios (personal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/mis-servicios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "mis-servicios"
+              ]
+            },
+            "description": "El responsable ve sus servicios asignados.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Aceptar servicio (personal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "El propietario observa la aceptación o el rechazo.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACEPTADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Iniciar servicio (personal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "Pasa a EN_PROCESO.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"EN_PROCESO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Otro personal no ve el servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}"
+              ]
+            },
+            "description": "El personal solo ve lo que tiene asignado.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US11 - Ejecutar checklist",
+      "item": [
+        {
+          "name": "Completar con checklist pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "No permite completar con ítems obligatorios pendientes.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Marcar checklist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/checklist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "checklist"
+              ]
+            },
+            "description": "El personal marca los ítems hechos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"item\": \"Cambiar sabanas y toallas\",\n    \"hecho\": true\n  },\n  {\n    \"item\": \"Limpiar bano y cocina\",\n    \"hecho\": true\n  },\n  {\n    \"item\": \"Barrer y trapear pisos\",\n    \"hecho\": true\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Ítem inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/checklist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "checklist"
+              ]
+            },
+            "description": "Solo se marcan ítems del checklist del servicio.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"item\": \"Pintar paredes\",\n    \"hecho\": true\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US12 - Adjuntar evidencias",
+      "item": [
+        {
+          "name": "Completar sin foto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "Exige al menos una foto de evidencia.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Subir foto de evidencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idEvidencia\", pm.response.json().idEvidencia);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/evidencias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "evidencias"
+              ]
+            },
+            "description": "multipart/form-data: archivo (JPG, PNG o WEBP, máx. 5 MB) e idUsuario. Registra autor y fecha.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "idUsuario",
+                  "value": "4",
+                  "type": "text"
+                },
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "evidencia-ejemplo.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar evidencias del servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/evidencias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "evidencias"
+              ]
+            },
+            "description": "Fotos con autor y fecha.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver foto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/evidencias/{{idEvidencia}}/archivo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "evidencias",
+                "{{idEvidencia}}",
+                "archivo"
+              ]
+            },
+            "description": "Devuelve la imagen.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Completar servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{idServicioNuevo}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "servicios",
+                "{{idServicioNuevo}}",
+                "estado"
+              ]
+            },
+            "description": "Con checklist y foto, el servicio se completa.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US13 - Registrar incidencias",
+      "item": [
+        {
+          "name": "Registrar incidencia (personal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idIncidencia\", pm.response.json().idIncidencia);",
+                  "pm.test(\"Queda ABIERTA\", () => pm.expect(pm.response.json().estado).to.eql(\"ABIERTA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias"
+              ]
+            },
+            "description": "Queda en estado ABIERTA con trazabilidad.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPersonal}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 4,\n  \"categoria\": \"MANTENIMIENTO\",\n  \"prioridad\": \"ALTA\",\n  \"descripcion\": \"La ducha del baño principal no tiene agua caliente.\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"reserva\": {\n    \"idReserva\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar incidencias abiertas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias?estado=ABIERTA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "ABIERTA"
+                }
+              ]
+            },
+            "description": "Filtros por estado, prioridad e idAlojamiento.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener incidencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias/{{idIncidencia}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias",
+                "{{idIncidencia}}"
+              ]
+            },
+            "description": "Consulta por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar incidencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias/{{idIncidencia}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias",
+                "{{idIncidencia}}"
+              ]
+            },
+            "description": "Cambia prioridad y estado.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"MANTENIMIENTO\",\n  \"prioridad\": \"MEDIA\",\n  \"descripcion\": \"Ducha sin agua caliente. Gasfitero asignado.\",\n  \"estado\": \"EN_PROCESO\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  },\n  \"reserva\": {\n    \"idReserva\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Resolver incidencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias/{{idIncidencia}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias",
+                "{{idIncidencia}}",
+                "estado"
+              ]
+            },
+            "description": "Cambio de estado.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"RESUELTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar incidencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias/{{idIncidencia}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias",
+                "{{idIncidencia}}"
+              ]
+            },
+            "description": "Elimina la incidencia de prueba.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Prioridad inválida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/incidencias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "incidencias"
+              ]
+            },
+            "description": "Prioridad: BAJA, MEDIA, ALTA o CRITICA.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"categoria\": \"OTRO\",\n  \"prioridad\": \"URGENTE\",\n  \"descripcion\": \"x\",\n  \"alojamiento\": {\n    \"idAlojamiento\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US14 - Ingresos y ocupación",
+      "item": [
+        {
+          "name": "Registrar pago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idPago\", pm.response.json().idPago);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos"
+              ]
+            },
+            "description": "Pago asociado a una reserva.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"tipo\": \"INGRESO\",\n  \"importe\": 270.0,\n  \"moneda\": \"PEN\",\n  \"fecha\": \"2026-10-09T10:30:00\",\n  \"estado\": \"PAGADO\",\n  \"reserva\": {\n    \"idReserva\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar pagos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos"
+              ]
+            },
+            "description": "Pagos de las reservas del propietario.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener pago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos/{{idPago}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                "{{idPago}}"
+              ]
+            },
+            "description": "Consulta por id.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Anular pago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos/{{idPago}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos",
+                "{{idPago}}"
+              ]
+            },
+            "description": "Los pagos ANULADOS no cuentan en el reporte.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"INGRESO\",\n  \"importe\": 270.0,\n  \"moneda\": \"PEN\",\n  \"fecha\": \"2026-10-09T10:30:00\",\n  \"estado\": \"ANULADO\",\n  \"reserva\": {\n    \"idReserva\": 2\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reporte de ingresos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -2831,12 +3667,263 @@
                 }
               ]
             },
+            "description": "Ingresos, gastos, neto y pendiente, con detalle por alojamiento.",
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenPersonal}}",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reporte de ocupación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/ocupacion?fechaInicio=2026-10-01&fechaFin=2026-10-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "ocupacion"
+              ],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2026-10-31"
+                }
+              ]
+            },
+            "description": "Noches ocupadas sobre noches del periodo.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tipo de pago inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos"
+              ]
+            },
+            "description": "Tipo: INGRESO o GASTO.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idUsuario\": 2,\n  \"tipo\": \"TARJETA\",\n  \"importe\": 100,\n  \"reserva\": {\n    \"idReserva\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US15 - Reporte de operación",
+      "item": [
+        {
+          "name": "Reporte de operación (propietario)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/operacion?fechaInicio=2026-10-01&fechaFin=2026-10-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "operacion"
+              ],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2026-10-31"
+                }
+              ]
+            },
+            "description": "Servicios por estado, evidencia, atrasos e incidencias por prioridad (solo sus alojamientos).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reporte de operación (administrador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/operacion?fechaInicio=2026-10-01&fechaFin=2026-10-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "operacion"
+              ],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2026-10-31"
+                }
+              ]
+            },
+            "description": "Vista global.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Periodo inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reportes/operacion?fechaInicio=2026-10-31&fechaFin=2026-10-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reportes",
+                "operacion"
+              ],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2026-10-01"
+                }
+              ]
+            },
+            "description": "La fecha de inicio no puede ser posterior a la final.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
                   "type": "string"
                 }
               ]
@@ -2846,18 +3933,18 @@
       ]
     },
     {
-      "name": "11 Auditoria (US22)",
+      "name": "US22 - Auditoría de acciones críticas",
       "item": [
         {
-          "name": "Bitacora de reservas",
+          "name": "Consultar auditoría",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"Registra las acciones\", function () { pm.expect(pm.response.json().length).to.be.above(0); });"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Hay registros\", () => pm.expect(pm.response.json().length).to.be.above(0));"
                 ]
               }
             }
@@ -2866,7 +3953,45 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/auditorias?entidad=reservas",
+              "raw": "{{baseUrl}}/auditorias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auditorias"
+              ]
+            },
+            "description": "Usuario, fecha, entidad y operación de cada acción.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Auditoría filtrada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auditorias?entidad=reservas&usuario=lmendoza",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2877,9 +4002,14 @@
                 {
                   "key": "entidad",
                   "value": "reservas"
+                },
+                {
+                  "key": "usuario",
+                  "value": "lmendoza"
                 }
               ]
             },
+            "description": "Filtros por entidad y usuario.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2889,6 +4019,297 @@
                   "type": "string"
                 }
               ]
+            }
+          }
+        },
+        {
+          "name": "Propietario no ve auditoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auditorias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auditorias"
+              ]
+            },
+            "description": "Solo el rol autorizado (ADMIN).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catálogos (soporte de los formularios)",
+      "item": [
+        {
+          "name": "Ubigeos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ubigeos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ubigeos"
+              ]
+            },
+            "description": "Distritos para el formulario de alojamiento.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Países",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Catálogos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/catalogos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "catalogos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Datos de catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/datacatalogos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "datacatalogos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar país (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"iso\": \"PY\",\n  \"nombre\": \"Paraguay\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Propietario no modifica catálogos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"Mensaje de error en JSON\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPropietario}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"iso\": \"FR\",\n  \"nombre\": \"Francia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }
@@ -2921,6 +4342,10 @@
       "value": ""
     },
     {
+      "key": "idUsuarioNuevo",
+      "value": ""
+    },
+    {
       "key": "idAlojamientoNuevo",
       "value": ""
     },
@@ -2930,6 +4355,10 @@
     },
     {
       "key": "idReservaNueva",
+      "value": ""
+    },
+    {
+      "key": "idPersonalNuevo",
       "value": ""
     },
     {
@@ -2945,7 +4374,7 @@
       "value": ""
     },
     {
-      "key": "idPersonalNuevo",
+      "key": "idPago",
       "value": ""
     }
   ]
