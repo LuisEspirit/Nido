@@ -1,5 +1,6 @@
 package com.hotel.security;
 
+import com.hotel.entity.Alojamiento;
 import com.hotel.entity.Usuario;
 import com.hotel.exception.ReglaNegocioException;
 import com.hotel.repository.UsuarioRepository;
@@ -46,5 +47,21 @@ public class UsuarioActual {
     public Usuario usuario() {
         return usuarioRepository.findByLogin(login())
                 .orElseThrow(() -> new ReglaNegocioException("Sesion invalida", HttpStatus.UNAUTHORIZED));
+    }
+
+    /** Un propietario (no admin) solo puede ver y operar sus propios alojamientos (US03). */
+    public boolean puedeVer(Alojamiento alojamiento) {
+        if (!esSoloPropietario()) {
+            return true;
+        }
+        return alojamiento != null && alojamiento.getPropietario() != null
+                && login().equals(alojamiento.getPropietario().getLogin());
+    }
+
+    public void verificarAlojamiento(Alojamiento alojamiento) {
+        if (!puedeVer(alojamiento)) {
+            throw new ReglaNegocioException("El alojamiento no pertenece al propietario que inicio sesion.",
+                    HttpStatus.FORBIDDEN);
+        }
     }
 }

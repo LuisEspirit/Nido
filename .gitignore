@@ -16,3 +16,6 @@ application-local.properties
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Fotos de evidencia subidas en local
+uploads/

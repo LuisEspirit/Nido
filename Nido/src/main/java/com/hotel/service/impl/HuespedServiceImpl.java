@@ -1,6 +1,7 @@
 package com.hotel.service.impl;
 
 import com.hotel.entity.Huesped;
+import com.hotel.exception.RecursoNoEncontradoException;
 import com.hotel.repository.HuespedRepository;
 import com.hotel.service.HuespedService;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class HuespedServiceImpl implements HuespedService {
     @Override
     @Transactional
     public Huesped save(Huesped huesped) {
+        huesped.setIdHuesped(null);
         return huespedRepository.save(huesped);
     }
 
@@ -46,12 +48,13 @@ public class HuespedServiceImpl implements HuespedService {
             existing.setTelefono(huesped.getTelefono());
             existing.setConsentimiento(huesped.getConsentimiento());
             return huespedRepository.save(existing);
-        }).orElseThrow(() -> new RuntimeException("Huésped no encontrado con ID: " + id));
+        }).orElseThrow(() -> new RecursoNoEncontradoException("Huesped", id));
     }
 
     @Override
     @Transactional
     public void deleteById(Integer id) {
-        huespedRepository.deleteById(id);
+        huespedRepository.delete(huespedRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Huesped", id)));
     }
-}
+}
