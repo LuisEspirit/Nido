@@ -1,6 +1,8 @@
 package com.hotel.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,12 +20,16 @@ public class Reserva {
     @Column(name = "idReserva")
     private Integer idReserva;
 
+    @NotNull(message = "La fecha de entrada es obligatoria")
     private LocalDateTime entrada;
+
+    @NotNull(message = "La fecha de salida es obligatoria")
     private LocalDateTime salida;
 
     @Column(length = 45)
     private String canal;
 
+    @PositiveOrZero(message = "El precio no puede ser negativo")
     private Double precio;
 
     @Column(length = 10)
@@ -32,10 +38,12 @@ public class Reserva {
     @Column(length = 45)
     private String estado;
 
+    @NotNull(message = "El alojamiento es obligatorio")
     @ManyToOne
     @JoinColumn(name = "idAlojamiento", nullable = false)
     private Alojamiento alojamiento;
 
+    @NotNull(message = "El huesped es obligatorio")
     @ManyToOne
     @JoinColumn(name = "idHuesped", nullable = false)
     private Huesped huesped;

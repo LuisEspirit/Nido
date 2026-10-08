@@ -1,0 +1,13 @@
+{
+  "nombres": "Ana",
+  "apellidos": "Rios Paz",
+  "dni": "70000010",
+  "login": "arios",
+  "password": "Clave2026!",
+  "correo": "ana.rios@nido.pe",
+  "roles": [
+    {
+      "nombre": "PROPIETARIO"
+    }
+  ]
+}

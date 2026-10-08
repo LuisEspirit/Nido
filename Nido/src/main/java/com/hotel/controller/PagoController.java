@@ -2,6 +2,8 @@ package com.hotel.controller;
 
 import com.hotel.entity.Pago;
 import com.hotel.service.PagoService;
+import com.hotel.exception.RecursoNoEncontradoException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,21 +30,17 @@ public class PagoController {
     public ResponseEntity<Pago> obtenerPorId(@PathVariable Integer id) {
         return pagoService.findById(id)
                 .map(pago -> new ResponseEntity<>(pago, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Pago", id));
     }
 
     @PostMapping
-    public ResponseEntity<Pago> crear(@RequestBody Pago pago) {
+    public ResponseEntity<Pago> crear(@Valid @RequestBody Pago pago) {
         return new ResponseEntity<>(pagoService.save(pago), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pago> actualizar(@PathVariable Integer id, @RequestBody Pago pago) {
-        try {
-            return new ResponseEntity<>(pagoService.update(id, pago), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Pago> actualizar(@PathVariable Integer id, @Valid @RequestBody Pago pago) {
+        return new ResponseEntity<>(pagoService.update(id, pago), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -50,4 +48,4 @@ public class PagoController {
         pagoService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-}
+}

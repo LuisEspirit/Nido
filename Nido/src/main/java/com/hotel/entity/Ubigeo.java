@@ -1,6 +1,7 @@
 package com.hotel.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,15 @@ public class Ubigeo {
     @Column(name = "idubigeo")
     private Integer idubigeo;
 
+    @NotBlank(message = "El departamento es obligatorio")
     @Column(length = 45)
     private String departamento;
 
+    @NotBlank(message = "La provincia es obligatoria")
     @Column(length = 45)
     private String provincia;
 
+    @NotBlank(message = "El distrito es obligatorio")
     @Column(length = 45)
     private String distrito;
 }

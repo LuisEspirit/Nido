@@ -10,4 +10,6 @@ public interface IncidenciaService {
     Incidencia save(Incidencia incidencia);
     Incidencia update(Integer id, Incidencia incidencia);
     void deleteById(Integer id);
+    List<Incidencia> buscar(String estado, String prioridad, Integer idAlojamiento);
+    Incidencia cambiarEstado(Integer id, String estado);
 }

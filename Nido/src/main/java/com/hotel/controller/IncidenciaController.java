@@ -1,7 +1,10 @@
 package com.hotel.controller;
 
+import com.hotel.dto.EstadoRequest;
 import com.hotel.entity.Incidencia;
 import com.hotel.service.IncidenciaService;
+import com.hotel.exception.RecursoNoEncontradoException;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,30 +22,34 @@ public class IncidenciaController {
         this.incidenciaService = incidenciaService;
     }
 
+    /** Filtros opcionales: estado, prioridad e idAlojamiento. */
     @GetMapping
-    public ResponseEntity<List<Incidencia>> listarTodas() {
-        return new ResponseEntity<>(incidenciaService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<Incidencia>> listarTodas(@RequestParam(required = false) String estado,
+                                                        @RequestParam(required = false) String prioridad,
+                                                        @RequestParam(required = false) Integer idAlojamiento) {
+        return new ResponseEntity<>(incidenciaService.buscar(estado, prioridad, idAlojamiento), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Incidencia> obtenerPorId(@PathVariable Integer id) {
         return incidenciaService.findById(id)
                 .map(incidencia -> new ResponseEntity<>(incidencia, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Incidencia", id));
     }
 
     @PostMapping
-    public ResponseEntity<Incidencia> crear(@RequestBody Incidencia incidencia) {
+    public ResponseEntity<Incidencia> crear(@Valid @RequestBody Incidencia incidencia) {
         return new ResponseEntity<>(incidenciaService.save(incidencia), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Incidencia> actualizar(@PathVariable Integer id, @RequestBody Incidencia incidencia) {
-        try {
-            return new ResponseEntity<>(incidenciaService.update(id, incidencia), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Incidencia> actualizar(@PathVariable Integer id, @Valid @RequestBody Incidencia incidencia) {
+        return new ResponseEntity<>(incidenciaService.update(id, incidencia), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<Incidencia> cambiarEstado(@PathVariable Integer id, @Valid @RequestBody EstadoRequest request) {
+        return ResponseEntity.ok(incidenciaService.cambiarEstado(id, request.estado()));
     }
 
     @DeleteMapping("/{id}")
@@ -50,4 +57,4 @@ public class IncidenciaController {
         incidenciaService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-}
+}
