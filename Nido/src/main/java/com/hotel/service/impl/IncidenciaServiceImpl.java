@@ -58,6 +58,7 @@ public class IncidenciaServiceImpl implements IncidenciaService {
     @Override
     @Transactional
     public Incidencia save(Incidencia incidencia) {
+        usuarioActual.verificarRegistrante(incidencia.getIdUsuario());
         incidencia.setIdIncidencia(null);
         incidencia.setEstado("ABIERTA");
         prepararYValidar(incidencia);

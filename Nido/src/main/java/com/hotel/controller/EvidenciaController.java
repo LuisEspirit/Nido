@@ -28,11 +28,15 @@ public class EvidenciaController {
         return ResponseEntity.ok(evidenciaService.listarPorServicio(idServicio));
     }
 
-    /** Subir una foto: multipart/form-data con el campo "archivo" (JPG, PNG o WEBP, maximo 5 MB). */
+    /**
+     * Subir una foto: multipart/form-data con los campos "archivo" (JPG, PNG o WEBP, maximo 5 MB)
+     * e "idUsuario" (quien la registra).
+     */
     @PostMapping(value = "/servicios/{idServicio}/evidencias", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Evidencia> subir(@PathVariable Integer idServicio,
+                                           @RequestParam("idUsuario") Integer idUsuario,
                                            @RequestParam("archivo") MultipartFile archivo) {
-        return new ResponseEntity<>(evidenciaService.subir(idServicio, archivo), HttpStatus.CREATED);
+        return new ResponseEntity<>(evidenciaService.subir(idServicio, idUsuario, archivo), HttpStatus.CREATED);
     }
 
     @GetMapping("/evidencias/{id}")

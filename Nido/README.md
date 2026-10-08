@@ -19,11 +19,17 @@ Backend en Spring Boot 4 (Java 25) + MySQL 8, con seguridad JWT por roles.
 | login      | rol         | notas                                  |
 |------------|-------------|----------------------------------------|
 | `admin`    | ADMIN       | ve y administra todo                   |
-| `lmendoza` | PROPIETARIO | alojamientos 1, 2 y 5                  |
-| `jquispe`  | PROPIETARIO | alojamientos 3 y 4                     |
+| `lmendoza` | PROPIETARIO | alojamientos 1, 2, 5 y 6               |
+| `jquispe`  | PROPIETARIO | alojamientos 3, 4 y 7                  |
 | `rhuaman`  | PERSONAL    | limpieza                               |
 | `cflores`  | PERSONAL    | mantenimiento                          |
 | `mtorres`  | PERSONAL    | INACTIVO: no puede iniciar sesión      |
+| `aramos`   | PROPIETARIO | alojamientos 8 y 9                     |
+| `pvargas`  | PROPIETARIO | alojamientos 10, 11 y 12               |
+| `jsalazar` | PERSONAL    | limpieza                               |
+| `ecastillo`| PERSONAL    | mantenimiento                          |
+| `kpalomino`| PERSONAL    | inspección                             |
+| `snunez`   | ADMIN       | segunda cuenta de administración       |
 
 Primero `POST /api/v1/auth/login` con `{"login":"admin","password":"Nido2026!"}`; luego envíe el token en el
 header `Authorization: Bearer <token>`.
@@ -59,6 +65,13 @@ header `Authorization: Bearer <token>`.
 - **US11** – No se puede completar un servicio con ítems obligatorios del checklist sin marcar.
 - **US12** – No se puede completar un servicio sin al menos una foto (JPG, PNG o WEBP, máximo 5 MB).
 - **US22** – Toda creación, modificación o eliminación exitosa queda registrada en la tabla `auditoria`.
+
+- **Auditoría de registro** – Todo registro (alojamiento, huésped, reserva, pago, servicio, incidencia y evidencia)
+  envía el campo `idUsuario` (quién registra). Si falta responde `400`; si no es el usuario que inició sesión, `403`.
+  En los servicios, el personal asignado va en `personal` (columna `idPersonal`).
+
+La base de datos carga al menos 10 registros por tabla. El diagrama entidad-relación está en
+`database/diagrama-bd_nido.png`.
 
 Los errores se devuelven en JSON: `{"status": 409, "error": "Conflict", "mensaje": "...", "ruta": "..."}`.
 

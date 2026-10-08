@@ -37,6 +37,10 @@ public class Incidencia {
     @Column(length = 45)
     private String estado;
 
+    /** Usuario que registra el dato (auditoria de registro). Debe ser el usuario que inicio sesion. */
+    @Column(name = "idUsuario", updatable = false)
+    private Integer idUsuario;
+
     @NotNull(message = "El alojamiento es obligatorio")
     @ManyToOne
     @JoinColumn(name = "idAlojamiento", nullable = false)
@@ -50,6 +54,6 @@ public class Incidencia {
 
     @ManyToOne
     @JoinColumn(name = "idServicio")
-    @JsonIgnoreProperties({"alojamiento", "reserva", "usuario", "checklist"})
+    @JsonIgnoreProperties({"alojamiento", "reserva", "personal", "checklist"})
     private Servicio servicio;
 }

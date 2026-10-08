@@ -38,6 +38,10 @@ public class Pago {
     @Column(length = 45)
     private String estado;
 
+    /** Usuario que registra el dato (auditoria de registro). Debe ser el usuario que inicio sesion. */
+    @Column(name = "idUsuario", updatable = false)
+    private Integer idUsuario;
+
     @NotNull(message = "La reserva es obligatoria")
     @ManyToOne
     @JoinColumn(name = "idReserva", nullable = false)

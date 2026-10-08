@@ -53,6 +53,7 @@ public class PagoServiceImpl implements PagoService {
     @Override
     @Transactional
     public Pago save(Pago pago) {
+        usuarioActual.verificarRegistrante(pago.getIdUsuario());
         pago.setIdPago(null);
         prepararYValidar(pago);
         return pagoRepository.save(pago);

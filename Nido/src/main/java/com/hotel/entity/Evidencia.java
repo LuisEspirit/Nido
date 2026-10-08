@@ -38,7 +38,7 @@ public class Evidencia {
 
     @ManyToOne
     @JoinColumn(name = "idServicio", nullable = false)
-    @JsonIgnoreProperties({"alojamiento", "reserva", "usuario", "checklist"})
+    @JsonIgnoreProperties({"alojamiento", "reserva", "personal", "checklist"})
     private Servicio servicio;
 
     /** Autor de la evidencia. */

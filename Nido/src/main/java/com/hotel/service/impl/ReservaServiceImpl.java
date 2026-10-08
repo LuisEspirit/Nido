@@ -60,6 +60,7 @@ public class ReservaServiceImpl implements ReservaService {
     @Override
     @Transactional
     public Reserva save(Reserva reserva) {
+        usuarioActual.verificarRegistrante(reserva.getIdUsuario());
         reserva.setIdReserva(null);
         prepararYValidar(reserva, null);
         return reservaRepository.save(reserva);

@@ -39,6 +39,10 @@ public class Servicio {
     @Column(columnDefinition = "TEXT")
     private String checklist;
 
+    /** Usuario que registra el dato (auditoria de registro). Debe ser el usuario que inicio sesion. */
+    @Column(name = "idUsuario", updatable = false)
+    private Integer idUsuario;
+
     @NotNull(message = "El alojamiento es obligatorio")
     @ManyToOne
     @JoinColumn(name = "idAlojamiento", nullable = false)
@@ -50,10 +54,10 @@ public class Servicio {
     @JsonIgnoreProperties({"alojamiento", "huesped"})
     private Reserva reserva;
 
-    /** Personal operativo asignado. */
+    /** Personal operativo asignado al servicio. */
     @NotNull(message = "El personal asignado es obligatorio")
     @ManyToOne
-    @JoinColumn(name = "idUsuario", nullable = false)
+    @JoinColumn(name = "idPersonal", nullable = false)
     @JsonIgnoreProperties({"roles", "dni", "direccion", "fechaNacimiento", "fechaRegistro", "ubigeo"})
-    private Usuario usuario;
+    private Usuario personal;
 }

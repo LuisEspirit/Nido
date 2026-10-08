@@ -42,6 +42,10 @@ public class Alojamiento {
     @Column(length = 45)
     private String estado;
 
+    /** Usuario que registra el dato (auditoria de registro). Debe ser el usuario que inicio sesion. */
+    @Column(name = "idUsuario", updatable = false)
+    private Integer idUsuario;
+
     @ManyToOne
     @JoinColumn(name = "idPropietario", nullable = false)
     @JsonIgnoreProperties({"roles", "dni", "direccion", "fechaNacimiento", "fechaRegistro", "ubigeo", "especialidad"})

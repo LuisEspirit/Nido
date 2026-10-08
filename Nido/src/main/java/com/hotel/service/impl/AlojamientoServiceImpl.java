@@ -50,6 +50,7 @@ public class AlojamientoServiceImpl implements AlojamientoService {
     @Override
     @Transactional
     public Alojamiento save(Alojamiento alojamiento) {
+        usuarioActual.verificarRegistrante(alojamiento.getIdUsuario());
         alojamiento.setIdAlojamiento(null);
         alojamiento.setPropietario(resolverPropietario(alojamiento.getPropietario()));
         if (alojamiento.getEstado() == null || alojamiento.getEstado().isBlank()) {
