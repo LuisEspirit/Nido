@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alojamientos · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US03 Gestión de alojamientos · HU-01 Buscar alojamientos por estado -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Alojamientos</h1><p>Tu portafolio de propiedades. Cada propietario ve solo las suyas.</p></div>
+        <a class="btn btn-primario" href="/app/alojamiento-form.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Nuevo alojamiento</a></div>
+      <div class="filtros">
+        <div class="campo"><label for="f-estado">Estado</label><select class="input" id="f-estado"><option value="">Todos</option><option>DISPONIBLE</option><option>INACTIVO</option></select></div>
+        <div class="campo" style="flex:1;max-width:360px"><label for="f-texto">Buscar</label><input class="input" id="f-texto" placeholder="Nombre o dirección"></div>
+      </div>
+      <div class="grid-tarjetas" id="lista"></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("alojamientos.html");
+
+let alojamientos = [];
+const lista = document.getElementById("lista");
+function pintar() {
+  const t = document.getElementById("f-texto").value.trim().toLowerCase();
+  const vis = alojamientos.filter(a => !t || (a.nombre + " " + a.direccion).toLowerCase().includes(t));
+  lista.innerHTML = vis.length ? vis.map(a => `<article class="card aloj">
+    <div class="foto">${Nido.badge(a.estado)}${Nido.icono("building")}</div>
+    <div class="cuerpo"><div class="nombre">${Nido.esc(a.nombre)}</div>
+      <div class="caption" style="display:flex;gap:4px">${Nido.icono("map", "ico-16")}${Nido.esc(a.direccion)}</div>
+      <div class="meta"><span>${Nido.icono("users", "ico-16")}${a.capacidad} huéspedes</span><span>${Nido.icono("map", "ico-16")}${Nido.esc(a.ubigeo ? a.ubigeo.distrito : "—")}</span></div></div>
+    <div class="pie"><div class="precio">${Nido.moneda(a.precioBase)} <small>/ noche</small></div>
+      <div class="fila" style="gap:4px"><a class="btn btn-fantasma btn-icono" href="/app/alojamiento-form.html?id=${a.idAlojamiento}" aria-label="Editar ${Nido.esc(a.nombre)}">${Nido.icono("edit")}</a>
+      <button class="btn btn-fantasma btn-icono" data-del="${a.idAlojamiento}" aria-label="Eliminar ${Nido.esc(a.nombre)}">${Nido.icono("trash")}</button></div></div>
+  </article>`).join("") : `<div class="card" style="grid-column:1/-1">${Nido.vacio("building", "Aún no tienes alojamientos", "Agrega el primero para empezar.", '<a class="btn btn-primario" href="/app/alojamiento-form.html">Nuevo alojamiento</a>')}</div>`;
+}
+async function cargar() {
+  const estado = document.getElementById("f-estado").value;
+  lista.innerHTML = '<div class="card card-pad"><div class="esqueleto"></div></div>'.repeat(3);
+  try {
+    // HU-01: busqueda por estado. El endpoint responde 204 si no hay resultados.
+    alojamientos = (estado ? await Nido.get("/alojamientos/estado/" + estado) : await Nido.get("/alojamientos")) || [];
+    pintar();
+  } catch (e) { Nido.toast("error", "No pudimos cargar los alojamientos", e.mensaje); }
+}
+document.getElementById("f-estado").onchange = cargar;
+document.getElementById("f-texto").oninput = pintar;
+window.alBuscar = (t) => { document.getElementById("f-texto").value = t; pintar(); };
+lista.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-del]"); if (!b) return;
+  const a = alojamientos.find(x => x.idAlojamiento == b.dataset.del);
+  if (!await Nido.confirmar("Eliminar alojamiento", `¿Eliminar <strong>${Nido.esc(a.nombre)}</strong>? Esta acción no se puede deshacer.`)) return;
+  try { await Nido.del("/alojamientos/" + a.idAlojamiento); Nido.toast("exito", "Alojamiento eliminado", a.nombre); cargar(); }
+  catch (err) { Nido.toast("error", "No se pudo eliminar", err.status === 409 ? "Tiene reservas, servicios o incidencias asociadas. Márcalo como INACTIVO." : err.mensaje); }
+});
+cargar();
+
+</script>
+</body>
+</html>

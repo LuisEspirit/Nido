@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reportes · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US14 Ingresos y ocupación · US15 Reporte de operación -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Reportes</h1><p>Indicadores para decidir: ingresos, ocupación y cumplimiento de la operación.</p></div>
+        <form class="fila" id="periodo" style="align-items:flex-end">
+          <div class="campo"><label for="desde">Desde</label><input class="input" type="date" id="desde" required></div>
+          <div class="campo"><label for="hasta">Hasta</label><input class="input" type="date" id="hasta" required></div>
+          <button class="btn btn-primario">Consultar</button></form></div>
+      <section class="kpis" id="kpis"></section>
+      <div class="dos-col-igual">
+        <section class="card card-pad"><div class="panel-titulo"><h3>Ingresos por alojamiento</h3></div><div id="ingresos" class="pila" style="gap:14px"></div></section>
+        <section class="card card-pad"><div class="panel-titulo"><h3>Ocupación por alojamiento</h3><span class="caption" id="noches"></span></div><div id="ocupacion" class="pila" style="gap:14px"></div></section>
+        <section class="card card-pad"><div class="panel-titulo"><h3>Servicios por estado</h3></div><div id="servicios" class="pila" style="gap:10px"></div></section>
+        <section class="card card-pad"><div class="panel-titulo"><h3>Operación</h3></div><div id="operacion" class="pila" style="gap:14px"></div></section>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("reportes.html");
+
+const { desde, hasta } = Nido.mesActual();
+document.getElementById("desde").value = desde; document.getElementById("hasta").value = hasta;
+const barra = (pct, acento) => `<div class="barra ${acento ? "acento" : ""}"><span style="width:${Math.min(100, pct)}%"></span></div>`;
+async function cargar() {
+  const d = document.getElementById("desde").value, h = document.getElementById("hasta").value, q = `fechaInicio=${d}&fechaFin=${h}`;
+  try {
+    const [ing, ocu, ope] = await Promise.all([Nido.get("/reportes/ingresos?" + q), Nido.get("/reportes/ocupacion?" + q), Nido.get("/reportes/operacion?" + q)]);
+    document.getElementById("kpis").innerHTML = [["dollar", "Ingresos", Nido.moneda(ing.totalIngresos), "Gastos " + Nido.moneda(ing.totalGastos)], ["chart", "Ingreso neto", Nido.moneda(ing.neto), "Pendiente " + Nido.moneda(ing.pendienteDeCobro)],
+      ["bed", "Ocupación promedio", ocu.ocupacionPromedio + " %", ocu.nochesDelPeriodo + " noches en el periodo"], ["alert", "Servicios atrasados", ope.atrasos.cantidad, "Evidencia completa: " + ope.evidencia.completa]]
+      .map(([i, t, v, x]) => `<div class="card kpi"><div class="etiqueta">${Nido.icono(i, "ico-16")}${t}</div><div class="valor">${v}</div><div class="detalle">${x}</div></div>`).join("");
+    const max = Math.max(1, ...ing.porAlojamiento.map(a => a.ingresos));
+    document.getElementById("ingresos").innerHTML = ing.porAlojamiento.map(a => `<div><div class="fila" style="justify-content:space-between"><strong>${Nido.esc(a.alojamiento)}</strong><span>${Nido.moneda(a.neto)}</span></div>
+      ${barra(a.ingresos * 100 / max)}<span class="caption">Ingresos ${Nido.moneda(a.ingresos)} · Gastos ${Nido.moneda(a.gastos)}</span></div>`).join("") || Nido.vacio("dollar", "Sin ingresos en el periodo", "Cambia las fechas.");
+    document.getElementById("noches").textContent = ocu.nochesDelPeriodo + " noches";
+    document.getElementById("ocupacion").innerHTML = ocu.porAlojamiento.map(a => `<div><div class="fila" style="justify-content:space-between"><strong>${Nido.esc(a.alojamiento)}</strong><span>${a.ocupacion} %</span></div>
+      ${barra(a.ocupacion, true)}<span class="caption">${a.nochesOcupadas} noches ocupadas · ${a.reservas} reserva(s)</span></div>`).join("");
+    const totalS = Object.values(ope.serviciosPorEstado).reduce((t, v) => t + v, 0) || 1;
+    document.getElementById("servicios").innerHTML = Object.entries(ope.serviciosPorEstado).map(([e, n]) => `<div class="fila" style="justify-content:space-between">${Nido.badge(e)}<span style="flex:1;margin:0 12px">${barra(n * 100 / totalS)}</span><strong>${n}</strong></div>`).join("") || Nido.vacio("clipboard", "Sin servicios", "No hay servicios en el periodo.");
+    document.getElementById("operacion").innerHTML = `<div class="fila" style="justify-content:space-between"><span>Servicios con evidencia completa</span><strong>${ope.evidencia.completa} de ${ope.evidencia.completa + ope.evidencia.incompleta}</strong></div>
+      <div class="fila" style="justify-content:space-between"><span>Servicios atrasados</span><strong>${ope.atrasos.cantidad}</strong></div>
+      <div><span class="caption">Incidencias por prioridad</span><div class="fila" style="margin-top:6px">${Object.entries(ope.incidenciasPorPrioridad).map(([p, n]) => `${Nido.badge(p)} <strong>${n}</strong>`).join("&nbsp;&nbsp;") || "—"}</div></div>`;
+  } catch (e) { Nido.toast("error", "No pudimos generar el reporte", e.mensaje); }
+}
+document.getElementById("periodo").onsubmit = e => { e.preventDefault(); cargar(); };
+cargar();
+
+</script>
+</body>
+</html>

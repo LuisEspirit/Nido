@@ -49,6 +49,9 @@ public class SecurityConfig {
                 // Publico: inicio de sesion y documentacion de la API
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/error").permitAll()
+                // Frontend estatico (las paginas piden el token al llamar a la API)
+                .requestMatchers(HttpMethod.GET, "/", "/index.html", "/login.html", "/favicon.svg", "/app/**",
+                        "/css/**", "/js/**", "/img/**", "/fonts/**", "/vendor/**").permitAll()
 
                 // Personal operativo: sus servicios, checklist, evidencias e incidencias
                 .requestMatchers(HttpMethod.GET, "/api/v1/servicios/mis-servicios").hasAnyRole(ADMIN, PROPIETARIO, PERSONAL)

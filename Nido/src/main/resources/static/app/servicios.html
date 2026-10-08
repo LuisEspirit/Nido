@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Servicios · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US10 Crear y asignar servicio (con checklist US11 y evidencias US12) -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Servicios</h1><p>Limpieza, mantenimiento e inspección asignados a tu personal.</p></div>
+        <button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Nuevo servicio</button></div>
+      <div class="filtros"><div class="campo"><label for="f-estado">Estado</label><select class="input" id="f-estado"><option value="">Todos</option><option>PENDIENTE</option><option>ASIGNADO</option><option>ACEPTADO</option><option>RECHAZADO</option><option>EN_PROCESO</option><option>COMPLETADO</option><option>CANCELADO</option></select></div></div>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>#</th><th>Tipo</th><th>Alojamiento</th><th>Personal</th><th>Inicio</th><th>Checklist</th><th>Estado</th><th class="num">Acciones</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo" style="max-width:720px">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Nuevo servicio</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-4"><label for="tipo">Tipo <span class="req">*</span></label><select class="input" id="tipo" name="tipo" required><option>LIMPIEZA</option><option>MANTENIMIENTO</option><option>INSPECCION</option></select></div>
+          <div class="campo c-8"><label for="alojamiento">Alojamiento <span class="req">*</span></label><select class="input" id="alojamiento" name="alojamiento.idAlojamiento" required data-error="El alojamiento es obligatorio."></select><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="reserva">Reserva asociada</label><select class="input" id="reserva" name="reserva.idReserva"></select><span class="ayuda">Opcional. Solo reservas del alojamiento elegido.</span></div>
+          <div class="campo c-6"><label for="personal">Personal asignado <span class="req">*</span></label><select class="input" id="personal" name="personal.idusuario" required data-error="Elige a quién se asigna."></select><span class="ayuda">Solo aparece el personal ACTIVO (US09).</span><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="inicio">Inicio <span class="req">*</span></label><input class="input" id="inicio" name="inicio" type="datetime-local" required data-error="La fecha de inicio es obligatoria."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="fin">Fin estimado</label><input class="input" id="fin" name="fin" type="datetime-local"><span class="error-campo"></span></div>
+          <div class="c-12 alerta a-info"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="info"></svg><div><strong>Checklist</strong>Se carga el checklist base del tipo de servicio. El personal no podrá completarlo sin los ítems obligatorios y al menos una foto.</div></div>
+          <div class="campo c-12"><label for="idUsuario">Registrado por (idUsuario)</label><input class="input" id="idUsuario" readonly></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit">Asignar servicio</button></div>
+        </form></div></div>
+      <div class="modal-fondo" id="detalle"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="d-titulo">
+        <div class="modal-cab"><h3 id="d-titulo">Servicio</h3><button type="button" class="btn btn-fantasma btn-icono" onclick="Nido.cerrarModal('detalle')" aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo" id="d-cuerpo"></div></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("servicios.html");
+
+const form = document.getElementById("form"), u = Nido.usuario();
+let servicios = [], alojamientos = [], reservas = [];
+Nido.prepararFormulario(form);
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+const progreso = s => { const l = JSON.parse(s.checklist || "[]"); return `${l.filter(i => i.hecho).length}/${l.length}`; };
+function pintar(t = "") {
+  const fe = document.getElementById("f-estado").value;
+  const vis = servicios.filter(s => (!fe || s.estado === fe) && (!t || (s.alojamiento.nombre + " " + s.personal.nombres).toLowerCase().includes(t)))
+    .sort((a, b) => b.inicio.localeCompare(a.inicio));
+  document.getElementById("filas").innerHTML = vis.map(s => `<tr><td>${s.idServicio}</td><td>${Nido.esc(Nido.titulo(s.tipo))}</td><td>${Nido.esc(s.alojamiento.nombre)}</td>
+    <td>${Nido.esc(s.personal.nombres + " " + (s.personal.apellidos || ""))}</td><td>${Nido.fechaHora(s.inicio)}</td><td>${progreso(s)}</td><td>${Nido.badge(s.estado)}</td>
+    <td><div class="acciones"><button class="btn btn-fantasma btn-icono" data-ver="${s.idServicio}" aria-label="Ver servicio ${s.idServicio}">${Nido.icono("eye")}</button>
+    ${["COMPLETADO", "CANCELADO"].includes(s.estado) ? "" : `<button class="btn btn-fantasma btn-sm" data-cancel="${s.idServicio}">Cancelar</button>`}</div></td></tr>`).join("")
+    || `<tr><td colspan="8">${Nido.vacio("clipboard", "No hay servicios con ese estado", "Crea un servicio y asígnalo a tu personal.")}</td></tr>`;
+}
+window.alBuscar = pintar;
+async function cargar() { [servicios, alojamientos, reservas] = await Promise.all([Nido.get("/servicios"), Nido.get("/alojamientos"), Nido.get("/reservas")]); pintar(); }
+form.alojamiento.onchange = () => Nido.llenarSelect(form.reserva, reservas.filter(r => r.alojamiento.idAlojamiento == form.alojamiento.value && r.estado !== "CANCELADA"),
+  r => r.idReserva, r => `#${r.idReserva} · ${r.huesped.nombres} · ${Nido.fechaCorta(r.entrada)} al ${Nido.fechaCorta(r.salida)}`, "Sin reserva");
+document.getElementById("btn-nuevo").onclick = async () => {
+  form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error"));
+  const personal = await Nido.get("/usuarios/personal?soloActivos=true");
+  Nido.llenarSelect(form.alojamiento, alojamientos.filter(a => a.estado !== "INACTIVO"), a => a.idAlojamiento, a => a.nombre, "Selecciona un alojamiento");
+  Nido.llenarSelect(form.personal, personal, p => p.idusuario, p => `${p.nombres} ${p.apellidos || ""} · ${Nido.titulo(p.especialidad || "")}`, "Selecciona al personal");
+  Nido.llenarSelect(form.reserva, [], r => r, r => r, "Sin reserva");
+  form.idUsuario.value = u.idusuario + " · " + u.nombres;
+  Nido.abrirModal("modal");
+};
+document.getElementById("f-estado").onchange = () => pintar();
+document.getElementById("filas").addEventListener("click", async e => {
+  const v = e.target.closest("[data-ver]"), c = e.target.closest("[data-cancel]");
+  if (v) {
+    const s = servicios.find(x => x.idServicio == v.dataset.ver);
+    const evid = await Nido.get(`/servicios/${s.idServicio}/evidencias`);
+    document.getElementById("d-titulo").textContent = `${Nido.titulo(s.tipo)} · ${s.alojamiento.nombre}`;
+    document.getElementById("d-cuerpo").innerHTML = `<div class="fila" style="margin-bottom:16px">${Nido.badge(s.estado)}<span class="caption">${Nido.esc(s.personal.nombres)} · ${Nido.fechaHora(s.inicio)}</span></div>
+      <h4 style="margin:0 0 8px">Checklist (${progreso(s)})</h4><div class="checklist">${JSON.parse(s.checklist || "[]").map(i => `<div class="check-item ${i.hecho ? "hecho" : ""}">${Nido.icono(i.hecho ? "ok" : "clock")}<span>${Nido.esc(i.item)}</span>${i.obligatorio ? '<span class="badge b-primario oblig">Obligatorio</span>' : ""}</div>`).join("")}</div>
+      <h4 style="margin:20px 0 8px">Evidencias (${evid.length})</h4><div class="fotos" id="fotos">${evid.length ? "" : '<span class="caption">Sin fotos todavía.</span>'}</div>`;
+    Nido.abrirModal("detalle");
+    for (const ev of evid) { const img = document.createElement("img"); img.alt = ev.nombreArchivo + " · " + (ev.usuario?.nombres || ""); img.src = await Nido.imagen(`/evidencias/${ev.idEvidencia}/archivo`); document.getElementById("fotos").appendChild(img); }
+  }
+  if (c) {
+    const s = servicios.find(x => x.idServicio == c.dataset.cancel);
+    if (!await Nido.confirmar("Cancelar servicio", `¿Cancelar el servicio de <strong>${Nido.esc(Nido.titulo(s.tipo))}</strong> en ${Nido.esc(s.alojamiento.nombre)}?`, "Cancelar servicio")) return;
+    try { await Nido.patch(`/servicios/${s.idServicio}/estado`, { estado: "CANCELADO" }); Nido.toast("exito", "Servicio cancelado"); cargar(); }
+    catch (err) { Nido.toast("error", "No se pudo cancelar", err.mensaje); }
+  }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const cuerpo = { idUsuario: u.idusuario, tipo: form.tipo.value, inicio: form.inicio.value + ":00", fin: form.fin.value ? form.fin.value + ":00" : null,
+    alojamiento: { idAlojamiento: Number(form.alojamiento.value) }, reserva: form.reserva.value ? { idReserva: Number(form.reserva.value) } : null,
+    personal: { idusuario: Number(form.personal.value) } };
+  try { const s = await Nido.post("/servicios", cuerpo); Nido.cerrarModal("modal"); Nido.toast("exito", "Servicio asignado", `${s.personal.nombres} ya lo ve en sus tareas.`); cargar(); }
+  catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+cargar().catch(e => Nido.toast("error", "No pudimos cargar los servicios", e.mensaje));
+
+</script>
+</body>
+</html>

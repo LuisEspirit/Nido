@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calendario · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US08 Calendario operativo -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><div class="migas"><a href="/app/reservas.html">Reservas</a><span aria-hidden="true">›</span><span>Calendario</span></div><h1>Calendario operativo</h1><p>Llegadas, salidas y servicios del mes por alojamiento.</p></div>
+        <div class="fila">
+          <div class="campo"><label for="f-aloj" class="sr-only">Alojamiento</label><select class="input" id="f-aloj"></select></div>
+          <button class="btn btn-secundario btn-icono" id="ant" aria-label="Mes anterior"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="left"></svg></button>
+          <strong id="mes" style="min-width:150px;text-align:center;font:600 18px var(--f-titulo);color:var(--primario)"></strong>
+          <button class="btn btn-secundario btn-icono" id="sig" aria-label="Mes siguiente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="right"></svg></button></div></div>
+      <section class="card card-pad">
+        <div class="leyenda" style="margin-bottom:12px"><span><i style="background:var(--exito)"></i>Reserva confirmada / en curso</span><span><i style="background:var(--acento)"></i>Reserva pendiente</span><span><i style="background:var(--info)"></i>Servicio</span></div>
+        <div class="cal" id="cal" role="grid" aria-label="Calendario del mes"></div>
+      </section>
+      <section class="card card-pad" style="margin-top:24px"><h3 style="margin-bottom:12px">Vista de lista (alternativa accesible)</h3>
+        <div class="tabla-wrap"><table class="tabla"><thead><tr><th>Tipo</th><th>Alojamiento</th><th>Inicio</th><th>Fin</th><th>Detalle</th><th>Estado</th></tr></thead><tbody id="lista"></tbody></table></div></section>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("calendario.html");
+
+let ref = new Date(); ref.setDate(1);
+const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+async function cargar() {
+  const y = ref.getFullYear(), m = ref.getMonth(), primero = new Date(y, m, 1), ultimo = new Date(y, m + 1, 0);
+  document.getElementById("mes").textContent = primero.toLocaleDateString("es-PE", { month: "long", year: "numeric" }).replace(/^\w/, c => c.toUpperCase());
+  const fa = document.getElementById("f-aloj").value;
+  const eventos = await Nido.get(`/reportes/calendario?fechaInicio=${iso(primero)}&fechaFin=${iso(ultimo)}` + (fa ? "&idAlojamiento=" + fa : ""));
+  const inicio = new Date(primero); inicio.setDate(1 - ((primero.getDay() + 6) % 7));
+  let html = DIAS.map(d => `<div class="dia-sem" role="columnheader">${d}</div>`).join("");
+  const hoy = Nido.hoyISO();
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(inicio); d.setDate(inicio.getDate() + i); const k = iso(d);
+    if (i >= 35 && d.getMonth() !== m) break;
+    const del = eventos.filter(e => e.tipo === "RESERVA" ? (k >= e.inicio.slice(0, 10) && k <= e.fin.slice(0, 10)) : e.inicio.startsWith(k));
+    html += `<div class="dia ${d.getMonth() !== m ? "fuera" : ""} ${k === hoy ? "hoy" : ""}" role="gridcell"><span class="n">${d.getDate()}</span>` + del.slice(0, 4).map(e => {
+      if (e.tipo === "SERVICIO") return `<div class="ev ev-servicio" title="${Nido.esc(e.detalle)}">${Nido.esc(e.detalle.split(" - ")[0])} · ${Nido.esc(e.alojamiento)}</div>`;
+      const marca = k === e.inicio.slice(0, 10) ? "↘ " : k === e.fin.slice(0, 10) ? "↗ " : "";
+      return `<div class="ev ${e.estado === "PENDIENTE" ? "ev-pendiente" : "ev-reserva"}" title="${Nido.esc(e.detalle)}">${marca}${Nido.esc(e.alojamiento)}</div>`;
+    }).join("") + (del.length > 4 ? `<span class="caption">+${del.length - 4} más</span>` : "") + "</div>";
+  }
+  document.getElementById("cal").innerHTML = html;
+  document.getElementById("lista").innerHTML = eventos.map(e => `<tr><td>${Nido.badge(e.tipo)}</td><td>${Nido.esc(e.alojamiento)}</td><td>${Nido.fechaHora(e.inicio)}</td><td>${Nido.fechaHora(e.fin)}</td><td>${Nido.esc(e.detalle)}</td><td>${Nido.badge(e.estado)}</td></tr>`).join("")
+    || `<tr><td colspan="6">${Nido.vacio("calendar", "Mes sin actividad", "No hay reservas ni servicios en este mes.")}</td></tr>`;
+}
+document.getElementById("ant").onclick = () => { ref.setMonth(ref.getMonth() - 1); cargar(); };
+document.getElementById("sig").onclick = () => { ref.setMonth(ref.getMonth() + 1); cargar(); };
+document.getElementById("f-aloj").onchange = cargar;
+Nido.get("/alojamientos").then(a => { Nido.llenarSelect(document.getElementById("f-aloj"), a, x => x.idAlojamiento, x => x.nombre, "Todos los alojamientos"); return cargar(); })
+  .catch(e => Nido.toast("error", "No pudimos cargar el calendario", e.mensaje));
+
+</script>
+</body>
+</html>

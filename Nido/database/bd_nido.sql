@@ -25,6 +25,7 @@
 --      snunez     ADMIN         ACTIVO
 -- =====================================================================
 
+SET NAMES utf8mb4;
 DROP DATABASE IF EXISTS bd_nido;
 CREATE DATABASE bd_nido DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE bd_nido;
@@ -335,13 +336,13 @@ INSERT INTO opcion (nombre, estado, ruta, tipo) VALUES
  ('Panel','ACTIVO','/panel',1),
  ('Alojamientos','ACTIVO','/alojamientos',1),
  ('Reservas','ACTIVO','/reservas',1),
- ('Huespedes','ACTIVO','/huespedes',1),
+ ('Huéspedes','ACTIVO','/huespedes',1),
  ('Servicios','ACTIVO','/servicios',1),
  ('Incidencias','ACTIVO','/incidencias',1),
  ('Pagos e ingresos','ACTIVO','/pagos',1),
  ('Reportes','ACTIVO','/reportes',1),
  ('Usuarios y roles','ACTIVO','/usuarios',2),
- ('Auditoria','ACTIVO','/auditoria',2),
+ ('Auditoría','ACTIVO','/auditoria',2),
  ('Mis tareas','ACTIVO','/mis-tareas',3),
  ('Personal','ACTIVO','/personal',1);
 

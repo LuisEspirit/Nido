@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservas · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US06 Registrar reserva · US07 Evitar solapamiento de reservas -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Reservas</h1><p>Registra estadías sin dobles reservas: las fechas se validan contra el calendario del alojamiento.</p></div>
+        <div class="fila"><a class="btn btn-secundario" href="/app/calendario.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="calendar"></svg>Calendario</a><button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Nueva reserva</button></div></div>
+      <div class="filtros">
+        <div class="campo"><label for="f-aloj">Alojamiento</label><select class="input" id="f-aloj"></select></div>
+        <div class="campo"><label for="f-estado">Estado</label><select class="input" id="f-estado"><option value="">Todos</option><option>PENDIENTE</option><option>CONFIRMADA</option><option>EN_CURSO</option><option>FINALIZADA</option><option>CANCELADA</option></select></div>
+      </div>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>#</th><th>Huésped</th><th>Alojamiento</th><th>Entrada</th><th>Salida</th><th>Canal</th><th class="num">Precio</th><th>Estado</th><th class="num">Acciones</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo" style="max-width:720px">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Nueva reserva</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-6"><label for="alojamiento">Alojamiento <span class="req">*</span></label><select class="input" id="alojamiento" name="alojamiento.idAlojamiento" required data-error="El alojamiento es obligatorio."></select><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="huesped">Huésped <span class="req">*</span></label><select class="input" id="huesped" name="huesped.idHuesped" required data-error="El huésped es obligatorio."></select><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="entrada">Entrada (check-in) <span class="req">*</span></label><input class="input" id="entrada" name="entrada" type="datetime-local" required data-error="La fecha de entrada es obligatoria."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="salida">Salida (check-out) <span class="req">*</span></label><input class="input" id="salida" name="salida" type="datetime-local" required data-error="La fecha de salida es obligatoria."><span class="error-campo"></span></div>
+          <div class="c-12" id="disponibilidad" aria-live="polite"></div>
+          <div class="campo c-4"><label for="canal">Canal</label><select class="input" id="canal" name="canal"><option>AIRBNB</option><option>BOOKING</option><option selected>DIRECTO</option><option>WEB</option></select></div>
+          <div class="campo c-4"><label for="precio">Precio total</label><input class="input" id="precio" name="precio" type="number" min="0" step="0.01" placeholder="Se calcula si lo dejas vacío" data-error="El precio no puede ser negativo."><span class="ayuda" id="precio-ayuda">Noches × precio base del alojamiento.</span><span class="error-campo"></span></div>
+          <div class="campo c-4"><label for="moneda">Moneda</label><select class="input" id="moneda" name="moneda"><option>PEN</option><option>USD</option></select></div>
+          <div class="campo c-6"><label for="estado">Estado</label><select class="input" id="estado" name="estado"><option>PENDIENTE</option><option>CONFIRMADA</option><option>EN_CURSO</option><option>FINALIZADA</option><option>CANCELADA</option></select></div>
+          <div class="campo c-6"><label for="idUsuario">Registrado por (idUsuario)</label><input class="input" id="idUsuario" readonly></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit" id="btn-guardar">Guardar reserva</button></div>
+        </form></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("reservas.html");
+
+const form = document.getElementById("form"), u = Nido.usuario();
+let reservas = [], alojamientos = [], editando = null;
+Nido.prepararFormulario(form);
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+function pintar(t = "") {
+  const fa = document.getElementById("f-aloj").value, fe = document.getElementById("f-estado").value;
+  const vis = reservas.filter(r => (!fa || r.alojamiento.idAlojamiento == fa) && (!fe || r.estado === fe)
+      && (!t || (r.huesped.nombres + " " + r.huesped.apellidos + " " + r.alojamiento.nombre).toLowerCase().includes(t)))
+    .sort((a, b) => b.entrada.localeCompare(a.entrada));
+  document.getElementById("filas").innerHTML = vis.map(r => `<tr><td>${r.idReserva}</td><td>${Nido.esc(r.huesped.nombres + " " + r.huesped.apellidos)}</td>
+    <td>${Nido.esc(r.alojamiento.nombre)}</td><td>${Nido.fechaHora(r.entrada)}</td><td>${Nido.fechaHora(r.salida)}</td><td>${Nido.esc(r.canal || "—")}</td>
+    <td class="num">${Nido.moneda(r.precio, r.moneda)}</td><td>${Nido.badge(r.estado)}</td>
+    <td><div class="acciones"><button class="btn btn-fantasma btn-icono" data-edit="${r.idReserva}" aria-label="Editar reserva ${r.idReserva}">${Nido.icono("edit")}</button>
+    ${["CANCELADA", "FINALIZADA"].includes(r.estado) ? "" : `<button class="btn btn-fantasma btn-sm" data-cancel="${r.idReserva}">Cancelar</button>`}</div></td></tr>`).join("")
+    || `<tr><td colspan="9">${Nido.vacio("calendar", "No hay reservas con esos filtros", "Prueba con otro alojamiento o estado.")}</td></tr>`;
+}
+window.alBuscar = pintar;
+async function cargar() {
+  [reservas, alojamientos] = await Promise.all([Nido.get("/reservas"), Nido.get("/alojamientos")]);
+  pintar();
+}
+// US07: consulta la disponibilidad mientras se eligen las fechas y bloquea el guardado si hay cruce
+async function revisarDisponibilidad() {
+  const caja = document.getElementById("disponibilidad"), boton = document.getElementById("btn-guardar");
+  caja.innerHTML = ""; boton.disabled = false;
+  if (!form.alojamiento.value || !form.entrada.value || !form.salida.value) return;
+  if (form.salida.value <= form.entrada.value) { caja.innerHTML = `<div class="alerta a-error">${Nido.icono("error")}<div><strong>Revisa las fechas</strong>La salida debe ser posterior a la entrada.</div></div>`; boton.disabled = true; return; }
+  try {
+    const d = await Nido.get(`/reservas/disponibilidad?idAlojamiento=${form.alojamiento.value}&entrada=${form.entrada.value}:00&salida=${form.salida.value}:00`);
+    const otros = d.conflictos.filter(c => !editando || c.idReserva !== editando.idReserva);
+    if (otros.length) {
+      caja.innerHTML = `<div class="alerta a-error">${Nido.icono("error")}<div><strong>Las fechas elegidas ya están ocupadas. Prueba con otras.</strong>`
+        + otros.map(c => `Reserva ${c.idReserva}: ${Nido.fechaCorta(c.entrada)} ${Nido.hora(c.entrada)} al ${Nido.fechaCorta(c.salida)} ${Nido.hora(c.salida)}`).join("<br>") + "</div></div>";
+      boton.disabled = true;
+    } else {
+      const a = alojamientos.find(x => x.idAlojamiento == form.alojamiento.value);
+      const noches = Math.max(1, Math.round((new Date(form.salida.value.slice(0, 10)) - new Date(form.entrada.value.slice(0, 10))) / 864e5));
+      document.getElementById("precio-ayuda").textContent = `${noches} noche(s) × ${Nido.moneda(a?.precioBase)} = ${Nido.moneda(noches * (a?.precioBase || 0))}`;
+      caja.innerHTML = `<div class="alerta a-exito">${Nido.icono("ok")}<div><strong>Fechas disponibles</strong>${noches} noche(s) en ${Nido.esc(a?.nombre || "")}.</div></div>`;
+    }
+  } catch (e) { caja.innerHTML = `<div class="alerta a-error">${Nido.icono("error")}<div>${Nido.esc(e.mensaje)}</div></div>`; }
+}
+["alojamiento", "entrada", "salida"].forEach(k => form[k].addEventListener("change", revisarDisponibilidad));
+async function abrir(r) {
+  editando = r; form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error"));
+  document.getElementById("disponibilidad").innerHTML = ""; document.getElementById("btn-guardar").disabled = false;
+  document.getElementById("m-titulo").textContent = r ? "Editar reserva " + r.idReserva : "Nueva reserva";
+  const huespedes = await Nido.get("/huespedes");
+  Nido.llenarSelect(form.alojamiento, alojamientos.filter(a => a.estado !== "INACTIVO" || (r && a.idAlojamiento === r.alojamiento.idAlojamiento)), a => a.idAlojamiento, a => a.nombre, "Selecciona un alojamiento");
+  Nido.llenarSelect(form.huesped, huespedes, h => h.idHuesped, h => h.nombres + " " + h.apellidos + (h.consentimiento ? "" : " (sin consentimiento)"), "Selecciona un huésped");
+  form.idUsuario.value = u.idusuario + " · " + u.nombres;
+  if (r) {
+    form.alojamiento.value = r.alojamiento.idAlojamiento; form.huesped.value = r.huesped.idHuesped;
+    form.entrada.value = Nido.paraInput(r.entrada); form.salida.value = Nido.paraInput(r.salida);
+    form.canal.value = r.canal || "DIRECTO"; form.precio.value = r.precio ?? ""; form.moneda.value = r.moneda || "PEN"; form.estado.value = r.estado;
+  }
+  Nido.abrirModal("modal");
+}
+document.getElementById("btn-nuevo").onclick = () => abrir(null);
+document.getElementById("f-aloj").onchange = document.getElementById("f-estado").onchange = () => pintar();
+document.getElementById("filas").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-edit]"), ca = e.target.closest("[data-cancel]");
+  if (ed) abrir(reservas.find(r => r.idReserva == ed.dataset.edit));
+  if (ca) {
+    const r = reservas.find(x => x.idReserva == ca.dataset.cancel);
+    if (!await Nido.confirmar("Cancelar reserva", `¿Cancelar la reserva ${r.idReserva} de <strong>${Nido.esc(r.huesped.nombres)}</strong> en ${Nido.esc(r.alojamiento.nombre)}? Las fechas quedarán libres.`, "Cancelar reserva")) return;
+    try { await Nido.patch(`/reservas/${r.idReserva}/cancelar`); Nido.toast("exito", "Reserva cancelada", "Las fechas quedaron libres."); cargar(); }
+    catch (err) { Nido.toast("error", "No se pudo cancelar", err.mensaje); }
+  }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const cuerpo = { idUsuario: u.idusuario, entrada: form.entrada.value + ":00", salida: form.salida.value + ":00", canal: form.canal.value,
+    precio: form.precio.value === "" ? null : Number(form.precio.value), moneda: form.moneda.value, estado: form.estado.value,
+    alojamiento: { idAlojamiento: Number(form.alojamiento.value) }, huesped: { idHuesped: Number(form.huesped.value) } };
+  try {
+    const r = editando ? await Nido.put("/reservas/" + editando.idReserva, cuerpo) : await Nido.post("/reservas", cuerpo);
+    Nido.cerrarModal("modal"); Nido.toast("exito", editando ? "Reserva actualizada" : "Reserva registrada", `${r.alojamiento.nombre} · ${Nido.moneda(r.precio, r.moneda)}`); cargar();
+  } catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+cargar().then(() => {
+  Nido.llenarSelect(document.getElementById("f-aloj"), alojamientos, a => a.idAlojamiento, a => a.nombre, "Todos");
+  if (new URLSearchParams(location.search).has("nueva")) abrir(null);
+}).catch(e => Nido.toast("error", "No pudimos cargar las reservas", e.mensaje));
+
+</script>
+</body>
+</html>

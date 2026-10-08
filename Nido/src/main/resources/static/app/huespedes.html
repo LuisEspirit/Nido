@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Huéspedes · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US05 Gestión de huéspedes -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Huéspedes</h1><p>Datos de contacto con consentimiento para asociarlos a reservas.</p></div>
+        <button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Nuevo huésped</button></div>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>Nombres</th><th>Apellidos</th><th>Correo</th><th>Teléfono</th><th>Consentimiento</th><th class="num">Acciones</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Nuevo huésped</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-6"><label for="nombres">Nombres <span class="req">*</span></label><input class="input" id="nombres" name="nombres" required maxlength="100" data-error="Los nombres son obligatorios."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="apellidos">Apellidos <span class="req">*</span></label><input class="input" id="apellidos" name="apellidos" required maxlength="100" data-error="Los apellidos son obligatorios."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="correo">Correo</label><input class="input" id="correo" name="correo" type="email" maxlength="100" data-error="El correo no tiene un formato válido."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="telefono">Teléfono</label><input class="input" id="telefono" name="telefono" maxlength="45" placeholder="+51 987 654 321"><span class="error-campo"></span></div>
+          <div class="c-12"><label class="check"><input type="checkbox" id="consentimiento" name="consentimiento"><span><strong>Consentimiento</strong><br><span class="caption">El huésped autoriza el uso de sus datos para gestionar su estadía.</span></span></label></div>
+          <div class="campo c-12"><label for="idUsuario">Registrado por (idUsuario)</label><input class="input" id="idUsuario" readonly></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit">Guardar huésped</button></div>
+        </form></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("huespedes.html");
+
+const form = document.getElementById("form"), u = Nido.usuario();
+let huespedes = [], editando = null;
+Nido.prepararFormulario(form);
+form.idUsuario.value = u.idusuario + " · " + u.nombres;
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+function pintar(t = "") {
+  const vis = huespedes.filter(h => !t || (h.nombres + " " + h.apellidos + " " + (h.correo || "")).toLowerCase().includes(t));
+  document.getElementById("filas").innerHTML = vis.map(h => `<tr><td>${Nido.esc(h.nombres)}</td><td>${Nido.esc(h.apellidos)}</td>
+    <td>${Nido.esc(h.correo || "—")}</td><td>${Nido.esc(h.telefono || "—")}</td>
+    <td>${h.consentimiento ? '<span class="badge b-exito">Otorgado</span>' : '<span class="badge b-advertencia">Pendiente</span>'}</td>
+    <td><div class="acciones"><button class="btn btn-fantasma btn-icono" data-edit="${h.idHuesped}" aria-label="Editar">${Nido.icono("edit")}</button>
+    <button class="btn btn-fantasma btn-icono" data-del="${h.idHuesped}" aria-label="Eliminar">${Nido.icono("trash")}</button></div></td></tr>`).join("")
+    || `<tr><td colspan="6">${Nido.vacio("users", "Aún no tienes huéspedes", "Registra el primero para asociarlo a una reserva.")}</td></tr>`;
+}
+window.alBuscar = pintar;
+async function cargar() { huespedes = await Nido.get("/huespedes"); pintar(); }
+function abrir(h) {
+  editando = h; form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error"));
+  form.idUsuario.value = u.idusuario + " · " + u.nombres;
+  document.getElementById("m-titulo").textContent = h ? "Editar huésped" : "Nuevo huésped";
+  if (h) { ["nombres", "apellidos", "correo", "telefono"].forEach(k => form[k].value = h[k] || ""); form.consentimiento.checked = !!h.consentimiento; }
+  Nido.abrirModal("modal");
+}
+document.getElementById("btn-nuevo").onclick = () => abrir(null);
+document.getElementById("filas").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-edit]"), de = e.target.closest("[data-del]");
+  if (ed) abrir(huespedes.find(h => h.idHuesped == ed.dataset.edit));
+  if (de) {
+    const h = huespedes.find(x => x.idHuesped == de.dataset.del);
+    if (!await Nido.confirmar("Eliminar huésped", `¿Eliminar a <strong>${Nido.esc(h.nombres + " " + h.apellidos)}</strong>?`)) return;
+    try { await Nido.del("/huespedes/" + h.idHuesped); Nido.toast("exito", "Huésped eliminado"); cargar(); }
+    catch (err) { Nido.toast("error", "No se pudo eliminar", err.status === 409 ? "El huésped tiene reservas registradas." : err.mensaje); }
+  }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const cuerpo = { idUsuario: u.idusuario, nombres: form.nombres.value.trim(), apellidos: form.apellidos.value.trim(),
+    correo: form.correo.value.trim() || null, telefono: form.telefono.value.trim() || null, consentimiento: form.consentimiento.checked };
+  try {
+    editando ? await Nido.put("/huespedes/" + editando.idHuesped, cuerpo) : await Nido.post("/huespedes", cuerpo);
+    Nido.cerrarModal("modal"); Nido.toast("exito", editando ? "Cambios guardados" : "Huésped registrado", cuerpo.nombres + " " + cuerpo.apellidos); cargar();
+  } catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+cargar().catch(e => Nido.toast("error", "No pudimos cargar los huéspedes", e.mensaje));
+
+</script>
+</body>
+</html>
