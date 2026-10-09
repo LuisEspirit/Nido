@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alojamiento · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <script src="/vendor/leaflet/leaflet.js"></script>
+</head>
+<!-- US03 Gestión de alojamientos · US04 Ubicación del alojamiento -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="migas"><a href="/app/alojamientos.html">Alojamientos</a><span aria-hidden="true">›</span><span id="miga">Nuevo alojamiento</span></div>
+      <form id="form" novalidate>
+      <div class="cabecera"><h1 id="titulo">Nuevo alojamiento</h1>
+        <div class="fila"><a class="btn btn-secundario" href="/app/alojamientos.html">Cancelar</a><button class="btn btn-primario" type="submit">Guardar alojamiento</button></div></div>
+      <div class="dos-col">
+        <div class="pila">
+          <section class="card card-pad"><h3 style="margin-bottom:16px">Información general</h3>
+            <div class="grid-form">
+              <div class="campo c-8"><label for="nombre">Nombre <span class="req">*</span></label><input class="input" id="nombre" name="nombre" required minlength="3" maxlength="100" placeholder="Ej. Departamento Miraflores 2D" data-error="El nombre es obligatorio (mín. 3 caracteres)."><span class="error-campo"></span></div>
+              <div class="campo c-4"><label for="estado">Estado <span class="req">*</span></label><select class="input" id="estado" name="estado" required><option value="DISPONIBLE">Disponible</option><option value="INACTIVO">Inactivo</option></select><span class="error-campo"></span></div>
+              <div class="campo c-8"><label for="direccion">Dirección <span class="req">*</span></label><input class="input" id="direccion" name="direccion" required placeholder="Ej. Av. Larco 345, Miraflores" data-error="La dirección es obligatoria."><span class="error-campo"></span></div>
+              <div class="campo c-4"><label for="ubigeo">Distrito (ubigeo) <span class="req">*</span></label><select class="input" id="ubigeo" name="ubigeo.idubigeo" required data-error="Selecciona el distrito."></select><span class="error-campo"></span></div>
+            </div></section>
+          <section class="card card-pad"><h3 style="margin-bottom:16px">Capacidad y tarifa</h3>
+            <div class="grid-form">
+              <div class="campo c-4"><label for="capacidad">Capacidad (huéspedes) <span class="req">*</span></label><input class="input" id="capacidad" name="capacidad" type="number" min="1" required data-error="Indica una capacidad mayor a 0."><span class="error-campo"></span></div>
+              <div class="campo c-4"><label for="precioBase">Precio base por noche <span class="req">*</span></label><input class="input" id="precioBase" name="precioBase" type="number" min="0" step="0.01" required data-error="El precio no puede ser negativo."><span class="ayuda">Moneda predeterminada: PEN (S/)</span><span class="error-campo"></span></div>
+              <div class="campo c-4"><label for="propietario">Propietario</label><select class="input" id="propietario" name="propietario.idusuario"></select><span class="error-campo"></span></div>
+            </div></section>
+        </div>
+        <div class="pila">
+          <section class="card card-pad"><h3 style="margin-bottom:4px">Ubicación en el mapa</h3><p class="caption" style="margin:0 0 16px">Obtén las coordenadas desde la dirección y confírmalas antes de guardar (US04).</p>
+            <div id="mapa" class="mapa"></div>
+            <div class="grid-form" style="margin-top:16px">
+              <div class="campo c-6"><label for="latitud">Latitud</label><input class="input" id="latitud" name="latitud" type="number" step="any" min="-90" max="90" data-error="Entre -90 y 90."><span class="error-campo"></span></div>
+              <div class="campo c-6"><label for="longitud">Longitud</label><input class="input" id="longitud" name="longitud" type="number" step="any" min="-180" max="180" data-error="Entre -180 y 180."><span class="error-campo"></span></div>
+            </div>
+            <div id="geo-res" class="alerta a-info" style="display:none;margin-top:12px"></div>
+            <button type="button" class="btn btn-secundario" id="btn-geo" style="width:100%;margin-top:12px"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="map"></svg>Obtener de la dirección</button>
+          </section>
+          <section class="card card-pad"><h3 style="margin-bottom:16px">Registro</h3>
+            <div class="campo"><label for="idUsuario">Registrado por (idUsuario)</label><input class="input" id="idUsuario" name="idUsuario" readonly><span class="ayuda">Se envía automáticamente con el usuario que inició sesión.</span></div>
+          </section>
+        </div>
+      </div>
+      </form>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("alojamiento-form.html");
+
+const params = new URLSearchParams(location.search), id = params.get("id");
+const form = document.getElementById("form"), u = Nido.usuario();
+let mapa, marcador;
+Nido.prepararFormulario(form);
+function ponerMarcador(lat, lon) {
+  if (!window.L || lat === "" || lon === "" || lat == null) return;
+  if (!mapa) { mapa = L.map("mapa").setView([lat, lon], 16); L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(mapa); }
+  mapa.setView([lat, lon], 16);
+  if (marcador) marcador.setLatLng([lat, lon]); else marcador = L.marker([lat, lon], { draggable: true }).addTo(mapa)
+    .on("dragend", e => { const p = e.target.getLatLng(); form.latitud.value = p.lat.toFixed(7); form.longitud.value = p.lng.toFixed(7); });
+}
+(async () => {
+  const ubigeos = await Nido.get("/ubigeos");
+  Nido.llenarSelect(form.ubigeo, ubigeos, x => x.idubigeo, x => `${x.distrito} (${x.provincia}, ${x.departamento})`, "Selecciona un distrito");
+  if (Nido.tieneRol("ADMIN")) {
+    const usuarios = (await Nido.get("/usuarios")).filter(x => x.roles.some(r => r.nombre === "PROPIETARIO"));
+    Nido.llenarSelect(form.propietario, usuarios, x => x.idusuario, x => `${x.nombres} ${x.apellidos || ""}`, "Selecciona el propietario");
+    form.propietario.required = true;
+  } else {
+    Nido.llenarSelect(form.propietario, [u], x => x.idusuario, x => x.nombres);
+    form.propietario.disabled = true;
+  }
+  form.idUsuario.value = u.idusuario + " · " + u.nombres;
+  if (id) {
+    const a = await Nido.get("/alojamientos/" + id);
+    document.getElementById("titulo").textContent = document.getElementById("miga").textContent = a.nombre;
+    ["nombre", "estado", "direccion", "capacidad", "precioBase", "latitud", "longitud"].forEach(k => form[k].value = a[k] ?? "");
+    form.ubigeo.value = a.ubigeo?.idubigeo || "";
+    form.propietario.value = a.propietario?.idusuario || "";
+    ponerMarcador(a.latitud, a.longitud);
+  } else ponerMarcador(-12.1219, -77.0297);
+})().catch(e => Nido.toast("error", "No pudimos cargar el formulario", e.mensaje));
+
+document.getElementById("btn-geo").onclick = async () => {
+  const res = document.getElementById("geo-res");
+  if (form.direccion.value.trim().length < 5) { Nido.toast("advertencia", "Escribe la dirección", "Necesitamos la dirección para ubicarla en el mapa."); return; }
+  const distrito = form.ubigeo.selectedOptions[0]?.textContent.split(" (")[0] || "";
+  try {
+    const g = await Nido.get("/geocodificacion?direccion=" + encodeURIComponent(form.direccion.value + (distrito ? ", " + distrito : "") + ", Peru"));
+    form.latitud.value = g.latitud.toFixed(7); form.longitud.value = g.longitud.toFixed(7);
+    ponerMarcador(g.latitud, g.longitud);
+    res.innerHTML = Nido.icono("info") + `<div><strong>Confirma la ubicación</strong>${Nido.esc(g.direccionEncontrada)} (fuente: ${Nido.esc(g.fuente)}). Puedes arrastrar el marcador.</div>`;
+    res.style.display = "flex";
+  } catch (e) { Nido.toast(e.status === 404 ? "advertencia" : "error", "No encontramos la dirección", e.mensaje); }
+};
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!Nido.formularioValido(form)) { Nido.toast("error", "Revisa el formulario", "Hay campos obligatorios sin completar."); return; }
+  // Cuerpo JSON: los mismos campos del formulario (ver Anexo de endpoints)
+  const cuerpo = {
+    idUsuario: u.idusuario, nombre: form.nombre.value.trim(), direccion: form.direccion.value.trim(),
+    latitud: form.latitud.value === "" ? null : Number(form.latitud.value), longitud: form.longitud.value === "" ? null : Number(form.longitud.value),
+    capacidad: Number(form.capacidad.value), precioBase: Number(form.precioBase.value), estado: form.estado.value,
+    propietario: { idusuario: Number(form.propietario.value) }, ubigeo: { idubigeo: Number(form.ubigeo.value) }
+  };
+  try {
+    const a = id ? await Nido.put("/alojamientos/" + id, cuerpo) : await Nido.post("/alojamientos", cuerpo);
+    Nido.toast("exito", id ? "Cambios guardados" : "Alojamiento registrado", a.nombre + " ya aparece en tu portafolio.");
+    setTimeout(() => location.href = "/app/alojamientos.html", 900);
+  } catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+
+</script>
+</body>
+</html>

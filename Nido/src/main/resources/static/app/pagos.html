@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pagos e ingresos · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US14 Ingresos y ocupación (registro de pagos y gastos) -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Pagos e ingresos</h1><p>Ingresos y gastos asociados a cada reserva.</p></div>
+        <button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Registrar pago</button></div>
+      <section class="kpis" id="kpis"></section>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>#</th><th>Fecha</th><th>Reserva</th><th>Alojamiento</th><th>Tipo</th><th class="num">Importe</th><th>Estado</th><th class="num">Acciones</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Registrar pago</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-12"><label for="reserva">Reserva <span class="req">*</span></label><select class="input" id="reserva" name="reserva.idReserva" required data-error="La reserva es obligatoria."></select><span class="error-campo"></span></div>
+          <div class="campo c-4"><label for="tipo">Tipo <span class="req">*</span></label><select class="input" id="tipo" name="tipo"><option>INGRESO</option><option>GASTO</option></select></div>
+          <div class="campo c-4"><label for="importe">Importe <span class="req">*</span></label><input class="input" id="importe" name="importe" type="number" min="0.01" step="0.01" required data-error="El importe debe ser mayor a 0."><span class="error-campo"></span></div>
+          <div class="campo c-4"><label for="moneda">Moneda</label><select class="input" id="moneda" name="moneda"><option>PEN</option><option>USD</option></select></div>
+          <div class="campo c-6"><label for="fecha">Fecha</label><input class="input" id="fecha" name="fecha" type="datetime-local"><span class="ayuda">Si la dejas vacía se usa la fecha actual.</span></div>
+          <div class="campo c-6"><label for="estado">Estado</label><select class="input" id="estado" name="estado"><option>PAGADO</option><option>PENDIENTE</option><option>ANULADO</option></select></div>
+          <div class="campo c-12"><label for="idUsuario">Registrado por (idUsuario)</label><input class="input" id="idUsuario" readonly></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit">Guardar pago</button></div>
+        </form></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("pagos.html");
+
+const form = document.getElementById("form"), u = Nido.usuario();
+let pagos = [], reservas = [];
+Nido.prepararFormulario(form);
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+async function cargar() {
+  [pagos, reservas] = await Promise.all([Nido.get("/pagos"), Nido.get("/reservas")]);
+  const suma = (f) => pagos.filter(f).reduce((t, p) => t + p.importe, 0);
+  const ing = suma(p => p.tipo === "INGRESO" && p.estado === "PAGADO"), gas = suma(p => p.tipo === "GASTO" && p.estado === "PAGADO"), pen = suma(p => p.estado === "PENDIENTE");
+  document.getElementById("kpis").innerHTML = [["dollar", "Ingresos cobrados", Nido.moneda(ing)], ["trash", "Gastos", Nido.moneda(gas)], ["chart", "Neto", Nido.moneda(ing - gas)], ["clock", "Pendiente de cobro", Nido.moneda(pen)]]
+    .map(([i, t, v]) => `<div class="card kpi"><div class="etiqueta">${Nido.icono(i, "ico-16")}${t}</div><div class="valor">${v}</div></div>`).join("");
+  document.getElementById("filas").innerHTML = pagos.sort((a, b) => (b.fecha || "").localeCompare(a.fecha || "")).map(p => `<tr><td>${p.idPago}</td><td>${Nido.fechaHora(p.fecha)}</td>
+    <td>#${p.reserva.idReserva}</td><td>${Nido.esc(p.reserva.alojamiento?.nombre || "—")}</td><td>${Nido.badge(p.tipo)}</td>
+    <td class="num">${p.tipo === "GASTO" ? "− " : ""}${Nido.moneda(p.importe, p.moneda)}</td><td>${Nido.badge(p.estado)}</td>
+    <td><div class="acciones">${p.estado !== "ANULADO" ? `<button class="btn btn-fantasma btn-sm" data-anular="${p.idPago}">Anular</button>` : ""}</div></td></tr>`).join("")
+    || `<tr><td colspan="8">${Nido.vacio("dollar", "Aún no hay pagos", "Registra el primer pago de una reserva.")}</td></tr>`;
+}
+document.getElementById("btn-nuevo").onclick = () => {
+  form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error"));
+  Nido.llenarSelect(form.reserva, reservas.filter(r => r.estado !== "CANCELADA"), r => r.idReserva, r => `#${r.idReserva} · ${r.huesped.nombres} ${r.huesped.apellidos} · ${r.alojamiento.nombre} · ${Nido.moneda(r.precio, r.moneda)}`, "Selecciona una reserva");
+  form.idUsuario.value = u.idusuario + " · " + u.nombres; Nido.abrirModal("modal");
+};
+document.getElementById("filas").addEventListener("click", async e => {
+  const b = e.target.closest("[data-anular]"); if (!b) return;
+  const p = pagos.find(x => x.idPago == b.dataset.anular);
+  if (!await Nido.confirmar("Anular pago", `¿Anular el pago #${p.idPago} por <strong>${Nido.moneda(p.importe, p.moneda)}</strong>?`, "Anular")) return;
+  try { await Nido.put("/pagos/" + p.idPago, { tipo: p.tipo, importe: p.importe, moneda: p.moneda, fecha: p.fecha, estado: "ANULADO", reserva: { idReserva: p.reserva.idReserva } }); Nido.toast("exito", "Pago anulado"); cargar(); }
+  catch (err) { Nido.toast("error", "No se pudo anular", err.mensaje); }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const cuerpo = { idUsuario: u.idusuario, tipo: form.tipo.value, importe: Number(form.importe.value), moneda: form.moneda.value,
+    fecha: form.fecha.value ? form.fecha.value + ":00" : null, estado: form.estado.value, reserva: { idReserva: Number(form.reserva.value) } };
+  try { await Nido.post("/pagos", cuerpo); Nido.cerrarModal("modal"); Nido.toast("exito", "Pago registrado", Nido.moneda(cuerpo.importe, cuerpo.moneda)); cargar(); }
+  catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+cargar().catch(e => Nido.toast("error", "No pudimos cargar los pagos", e.mensaje));
+
+</script>
+</body>
+</html>

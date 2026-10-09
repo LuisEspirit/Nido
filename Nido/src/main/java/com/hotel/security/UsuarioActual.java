@@ -64,4 +64,19 @@ public class UsuarioActual {
                     HttpStatus.FORBIDDEN);
         }
     }
+
+    /**
+     * Todo registro envia el campo idUsuario (quien registra). Debe coincidir con el usuario
+     * que inicio sesion, para que nadie registre datos a nombre de otro.
+     */
+    public void verificarRegistrante(Integer idUsuario) {
+        if (idUsuario == null) {
+            throw new ReglaNegocioException("Debe enviar el campo idUsuario (usuario que registra).",
+                    HttpStatus.BAD_REQUEST);
+        }
+        if (!usuario().getIdusuario().equals(idUsuario)) {
+            throw new ReglaNegocioException("El idUsuario " + idUsuario
+                    + " no corresponde al usuario que inicio sesion.", HttpStatus.FORBIDDEN);
+        }
+    }
 }

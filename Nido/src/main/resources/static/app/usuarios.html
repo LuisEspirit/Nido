@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuarios y roles · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US02 Usuarios y roles -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Usuarios y roles</h1><p>Controla quién accede a Nido y con qué permisos.</p></div>
+        <button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Nuevo usuario</button></div>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Roles</th><th>Estado</th><th class="num">Acciones</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Nuevo usuario</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-6"><label for="nombres">Nombres <span class="req">*</span></label><input class="input" id="nombres" name="nombres" required data-error="Los nombres son obligatorios."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="apellidos">Apellidos</label><input class="input" id="apellidos" name="apellidos"></div>
+          <div class="campo c-4"><label for="dni">DNI</label><input class="input" id="dni" name="dni" pattern="\d{8}" maxlength="8" data-error="El DNI debe tener 8 dígitos."><span class="error-campo"></span></div>
+          <div class="campo c-8"><label for="correo">Correo</label><input class="input" id="correo" name="correo" type="email" data-error="El correo no tiene un formato válido."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="login">Usuario <span class="req">*</span></label><input class="input" id="login" name="login" required maxlength="15" data-error="El usuario es obligatorio (máx. 15)."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="password">Contraseña <span class="req" id="pass-req">*</span></label><input class="input" id="password" name="password" type="password" minlength="8" data-error="Mínimo 8 caracteres."><span class="ayuda" id="pass-ayuda">Mínimo 8 caracteres. Se guarda cifrada (BCrypt).</span><span class="error-campo"></span></div>
+          <fieldset class="c-12" style="border:1px solid var(--borde);border-radius:8px;padding:12px 16px"><legend style="font-weight:600;padding:0 6px">Roles <span class="req">*</span></legend><div class="fila" id="roles" style="gap:20px"></div></fieldset>
+          <div class="campo c-6"><label for="estado">Estado</label><select class="input" id="estado" name="estado"><option>ACTIVO</option><option>INACTIVO</option></select></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit">Guardar usuario</button></div>
+        </form></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("usuarios.html");
+
+const form = document.getElementById("form");
+let usuarios = [], roles = [], editando = null;
+Nido.prepararFormulario(form);
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+async function cargar() {
+  [usuarios, roles] = await Promise.all([Nido.get("/usuarios"), Nido.get("/roles")]);
+  document.getElementById("filas").innerHTML = usuarios.map(x => `<tr><td><strong>${Nido.esc(x.nombres + " " + (x.apellidos || ""))}</strong></td><td>${Nido.esc(x.login)}</td><td>${Nido.esc(x.correo || "—")}</td>
+    <td>${x.roles.map(r => `<span class="badge b-primario">${Nido.esc(r.nombre)}</span>`).join(" ")}</td><td>${Nido.badge(x.estado)}</td>
+    <td><div class="acciones"><button class="btn btn-fantasma btn-icono" data-edit="${x.idusuario}" aria-label="Editar ${Nido.esc(x.login)}">${Nido.icono("edit")}</button>
+    <button class="btn btn-fantasma btn-sm" data-estado="${x.estado === "ACTIVO" ? "INACTIVO" : "ACTIVO"}" data-id="${x.idusuario}">${x.estado === "ACTIVO" ? "Desactivar" : "Activar"}</button></div></td></tr>`).join("");
+}
+function abrir(x) {
+  editando = x; form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error"));
+  document.getElementById("m-titulo").textContent = x ? "Editar " + x.login : "Nuevo usuario";
+  document.getElementById("roles").innerHTML = roles.filter(r => r.estado === "ACTIVO").map(r => `<label class="check"><input type="checkbox" value="${r.idrol}" ${x && x.roles.some(y => y.idrol === r.idrol) ? "checked" : ""}> ${Nido.esc(r.nombre)}</label>`).join("");
+  form.password.required = !x; document.getElementById("pass-req").style.display = x ? "none" : "";
+  document.getElementById("pass-ayuda").textContent = x ? "Déjala vacía para mantener la actual." : "Mínimo 8 caracteres. Se guarda cifrada (BCrypt).";
+  if (x) { ["nombres", "apellidos", "dni", "correo", "login", "estado"].forEach(k => form[k].value = x[k] || ""); }
+  Nido.abrirModal("modal");
+}
+document.getElementById("btn-nuevo").onclick = () => abrir(null);
+document.getElementById("filas").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-edit]"), es = e.target.closest("[data-estado]");
+  if (ed) abrir(usuarios.find(x => x.idusuario == ed.dataset.edit));
+  if (es) {
+    const x = usuarios.find(y => y.idusuario == es.dataset.id);
+    if (es.dataset.estado === "INACTIVO" && !await Nido.confirmar("Desactivar usuario", `¿Desactivar a <strong>${Nido.esc(x.login)}</strong>? No podrá iniciar sesión.`, "Desactivar")) return;
+    try { await Nido.patch(`/usuarios/${x.idusuario}/estado`, { estado: es.dataset.estado }); Nido.toast("exito", "Estado actualizado", x.login); cargar(); }
+    catch (err) { Nido.toast("error", "No se pudo cambiar el estado", err.mensaje); }
+  }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const sel = [...document.querySelectorAll("#roles input:checked")].map(c => ({ idrol: Number(c.value) }));
+  if (!sel.length) { Nido.toast("error", "Asigna al menos un rol", "Todo usuario necesita un rol válido antes de guardar."); return; }
+  const cuerpo = { nombres: form.nombres.value.trim(), apellidos: form.apellidos.value.trim() || null, dni: form.dni.value.trim() || null, correo: form.correo.value.trim() || null,
+    login: form.login.value.trim(), password: form.password.value || null, estado: form.estado.value, roles: sel };
+  try { editando ? await Nido.put("/usuarios/" + editando.idusuario, cuerpo) : await Nido.post("/usuarios", cuerpo);
+    Nido.cerrarModal("modal"); Nido.toast("exito", editando ? "Usuario actualizado" : "Usuario creado", cuerpo.login); cargar(); }
+  catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+cargar().catch(e => Nido.toast("error", "No pudimos cargar los usuarios", e.mensaje));
+
+</script>
+</body>
+</html>

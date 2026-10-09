@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personal · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US09 Gestión de personal -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Personal operativo</h1><p>Solo el personal ACTIVO puede iniciar sesión y recibir servicios.</p></div>
+        <button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Registrar personal</button></div>
+      <div class="filtros"><label class="check" style="align-self:center"><input type="checkbox" id="f-activos"> Mostrar solo activos</label></div>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>Nombre</th><th>DNI</th><th>Usuario</th><th>Especialidad</th><th>Correo</th><th>Estado</th><th class="num">Acciones</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Registrar personal</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-6"><label for="nombres">Nombres <span class="req">*</span></label><input class="input" id="nombres" name="nombres" required data-error="Los nombres son obligatorios."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="apellidos">Apellidos</label><input class="input" id="apellidos" name="apellidos"></div>
+          <div class="campo c-4"><label for="dni">DNI</label><input class="input" id="dni" name="dni" pattern="\d{8}" maxlength="8" data-error="El DNI debe tener 8 dígitos."><span class="error-campo"></span></div>
+          <div class="campo c-4"><label for="especialidad">Especialidad <span class="req">*</span></label><select class="input" id="especialidad" name="especialidad" required><option>LIMPIEZA</option><option>MANTENIMIENTO</option><option>INSPECCION</option></select></div>
+          <div class="campo c-4"><label for="correo">Correo</label><input class="input" id="correo" name="correo" type="email" data-error="El correo no tiene un formato válido."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="login">Usuario <span class="req">*</span></label><input class="input" id="login" name="login" required maxlength="15" data-error="El usuario es obligatorio (máx. 15)."><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="password">Contraseña <span class="req">*</span></label><input class="input" id="password" name="password" type="password" required minlength="8" data-error="Mínimo 8 caracteres."><span class="error-campo"></span></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit">Registrar</button></div>
+        </form></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("personal.html");
+
+const form = document.getElementById("form");
+let personal = [];
+Nido.prepararFormulario(form);
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+async function cargar() {
+  personal = await Nido.get("/usuarios/personal?soloActivos=" + document.getElementById("f-activos").checked);
+  document.getElementById("filas").innerHTML = personal.map(p => `<tr><td><strong>${Nido.esc(p.nombres + " " + (p.apellidos || ""))}</strong></td><td>${Nido.esc(p.dni || "—")}</td><td>${Nido.esc(p.login)}</td>
+    <td>${Nido.esc(Nido.titulo(p.especialidad || "—"))}</td><td>${Nido.esc(p.correo || "—")}</td><td>${Nido.badge(p.estado)}</td>
+    <td><div class="acciones"><button class="btn ${p.estado === "ACTIVO" ? "btn-fantasma" : "btn-secundario"} btn-sm" data-id="${p.idusuario}" data-estado="${p.estado === "ACTIVO" ? "INACTIVO" : "ACTIVO"}">${p.estado === "ACTIVO" ? "Desactivar" : "Activar"}</button></div></td></tr>`).join("")
+    || `<tr><td colspan="7">${Nido.vacio("users", "Aún no tienes personal", "Registra a tu equipo de limpieza o mantenimiento.")}</td></tr>`;
+}
+document.getElementById("f-activos").onchange = cargar;
+document.getElementById("btn-nuevo").onclick = () => { form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error")); Nido.abrirModal("modal"); };
+document.getElementById("filas").addEventListener("click", async e => {
+  const b = e.target.closest("[data-estado]"); if (!b) return;
+  const p = personal.find(x => x.idusuario == b.dataset.id);
+  if (b.dataset.estado === "INACTIVO" && !await Nido.confirmar("Desactivar personal", `¿Desactivar a <strong>${Nido.esc(p.nombres)}</strong>? No podrá iniciar sesión ni recibir servicios.`, "Desactivar")) return;
+  try { await Nido.patch(`/usuarios/personal/${p.idusuario}/estado`, { estado: b.dataset.estado }); Nido.toast("exito", b.dataset.estado === "ACTIVO" ? "Personal activado" : "Personal desactivado", p.nombres); cargar(); }
+  catch (err) { Nido.toast("error", "No se pudo cambiar el estado", err.mensaje); }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const cuerpo = { nombres: form.nombres.value.trim(), apellidos: form.apellidos.value.trim() || null, dni: form.dni.value.trim() || null, login: form.login.value.trim(),
+    password: form.password.value, correo: form.correo.value.trim() || null, especialidad: form.especialidad.value };
+  try { const p = await Nido.post("/usuarios/personal", cuerpo); Nido.cerrarModal("modal"); Nido.toast("exito", "Personal registrado", p.nombres + " ya puede iniciar sesión."); cargar(); }
+  catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+cargar().catch(e => Nido.toast("error", "No pudimos cargar el personal", e.mensaje));
+
+</script>
+</body>
+</html>

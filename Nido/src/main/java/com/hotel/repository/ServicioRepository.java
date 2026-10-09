@@ -13,7 +13,7 @@ import java.util.List;
 public interface ServicioRepository extends JpaRepository<Servicio, Integer> {
 
     /** Servicios asignados a un personal operativo. */
-    List<Servicio> findByUsuario_IdusuarioOrderByInicioAsc(Integer idUsuario);
+    List<Servicio> findByPersonal_IdusuarioOrderByInicioAsc(Integer idUsuario);
 
     /** Servicios que empiezan dentro del periodo (calendario US08). */
     List<Servicio> findByInicioBetweenOrderByInicioAsc(LocalDateTime desde, LocalDateTime hasta);

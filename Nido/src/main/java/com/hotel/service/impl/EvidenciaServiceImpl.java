@@ -59,7 +59,8 @@ public class EvidenciaServiceImpl implements EvidenciaService {
 
     @Override
     @Transactional
-    public Evidencia subir(Integer idServicio, MultipartFile archivo) {
+    public Evidencia subir(Integer idServicio, Integer idUsuario, MultipartFile archivo) {
+        usuarioActual.verificarRegistrante(idUsuario);
         Servicio servicio = servicioService.obtenerConAcceso(idServicio);
         if ("COMPLETADO".equalsIgnoreCase(servicio.getEstado()) || "CANCELADO".equalsIgnoreCase(servicio.getEstado())) {
             throw new ReglaNegocioException("No se pueden agregar evidencias a un servicio " + servicio.getEstado() + ".");

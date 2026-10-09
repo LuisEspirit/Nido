@@ -3,6 +3,7 @@ package com.hotel.service.impl;
 import com.hotel.entity.Huesped;
 import com.hotel.exception.RecursoNoEncontradoException;
 import com.hotel.repository.HuespedRepository;
+import com.hotel.security.UsuarioActual;
 import com.hotel.service.HuespedService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,11 @@ import java.util.Optional;
 public class HuespedServiceImpl implements HuespedService {
 
     private final HuespedRepository huespedRepository;
+    private final UsuarioActual usuarioActual;
 
-    public HuespedServiceImpl(HuespedRepository huespedRepository) {
+    public HuespedServiceImpl(HuespedRepository huespedRepository, UsuarioActual usuarioActual) {
         this.huespedRepository = huespedRepository;
+        this.usuarioActual = usuarioActual;
     }
 
     @Override
@@ -34,6 +37,7 @@ public class HuespedServiceImpl implements HuespedService {
     @Override
     @Transactional
     public Huesped save(Huesped huesped) {
+        usuarioActual.verificarRegistrante(huesped.getIdUsuario());
         huesped.setIdHuesped(null);
         return huespedRepository.save(huesped);
     }

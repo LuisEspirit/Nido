@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auditoría · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US22 Auditoría de acciones críticas -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Auditoría</h1><p>Quién hizo qué y cuándo: cada creación, modificación y eliminación queda registrada.</p></div></div>
+      <form class="filtros" id="filtros">
+        <div class="campo"><label for="entidad">Entidad</label><select class="input" id="entidad"><option value="">Todas</option><option>alojamientos</option><option>reservas</option><option>huespedes</option><option>pagos</option><option>servicios</option><option>incidencias</option><option>usuarios</option></select></div>
+        <div class="campo"><label for="usuario">Usuario</label><input class="input" id="usuario" placeholder="login, p. ej. lmendoza"></div>
+        <button class="btn btn-secundario" style="align-self:flex-end"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="filter"></svg>Filtrar</button></form>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>Fecha</th><th>Usuario</th><th>Entidad</th><th>Operación</th><th>Registro</th><th>Detalle</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("auditoria.html");
+
+const OPER = { CREAR: "b-exito", ACTUALIZAR: "b-info", ELIMINAR: "b-error" };
+async function cargar() {
+  const q = new URLSearchParams(); const e = document.getElementById("entidad").value, us = document.getElementById("usuario").value.trim();
+  if (e) q.set("entidad", e); if (us) q.set("usuario", us);
+  const filas = await Nido.get("/auditorias?" + q);
+  document.getElementById("filas").innerHTML = filas.map(a => `<tr><td>${Nido.fechaHora(a.fecha)}</td><td><strong>${Nido.esc(a.usuario)}</strong></td><td>${Nido.esc(a.entidad)}</td>
+    <td><span class="badge ${OPER[a.operacion] || "b-neutro"}">${Nido.esc(Nido.titulo(a.operacion))}</span></td><td>${Nido.esc(a.idRegistro || "—")}</td><td><code>${Nido.esc(a.detalle)}</code></td></tr>`).join("")
+    || `<tr><td colspan="6">${Nido.vacio("history", "Sin registros", "No hay acciones con esos filtros.")}</td></tr>`;
+}
+document.getElementById("filtros").onsubmit = e => { e.preventDefault(); cargar(); };
+cargar().catch(e => Nido.toast("error", "No pudimos cargar la auditoría", e.mensaje));
+
+</script>
+</body>
+</html>

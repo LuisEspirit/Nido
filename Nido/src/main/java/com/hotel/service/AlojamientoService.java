@@ -11,4 +11,5 @@ public interface AlojamientoService {
     Alojamiento update(Integer id, Alojamiento alojamiento);
     void deleteById(Integer id);
     List<Alojamiento> buscarPorEstado(String estado);
+    Alojamiento confirmarUbicacion(Integer id, Double latitud, Double longitud);
 }

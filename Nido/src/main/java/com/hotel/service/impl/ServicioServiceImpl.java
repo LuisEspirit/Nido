@@ -98,7 +98,7 @@ public class ServicioServiceImpl implements ServicioService {
     @Override
     @Transactional(readOnly = true)
     public List<Servicio> misServicios() {
-        return servicioRepository.findByUsuario_IdusuarioOrderByInicioAsc(usuarioActual.usuario().getIdusuario());
+        return servicioRepository.findByPersonal_IdusuarioOrderByInicioAsc(usuarioActual.usuario().getIdusuario());
     }
 
     @Override
@@ -110,6 +110,7 @@ public class ServicioServiceImpl implements ServicioService {
     @Override
     @Transactional
     public Servicio save(Servicio servicio) {
+        usuarioActual.verificarRegistrante(servicio.getIdUsuario());
         servicio.setIdServicio(null);
         servicio.setEstado("ASIGNADO");
         prepararYValidar(servicio);
@@ -126,14 +127,14 @@ public class ServicioServiceImpl implements ServicioService {
         if (esFinal(existing.getEstado())) {
             throw new ReglaNegocioException("No se puede modificar un servicio " + existing.getEstado() + ".");
         }
-        boolean cambiaPersonal = servicio.getUsuario() != null
-                && !servicio.getUsuario().getIdusuario().equals(existing.getUsuario().getIdusuario());
+        boolean cambiaPersonal = servicio.getPersonal() != null
+                && !servicio.getPersonal().getIdusuario().equals(existing.getPersonal().getIdusuario());
         existing.setTipo(servicio.getTipo());
         existing.setInicio(servicio.getInicio());
         existing.setFin(servicio.getFin());
         existing.setAlojamiento(servicio.getAlojamiento());
         existing.setReserva(servicio.getReserva());
-        existing.setUsuario(servicio.getUsuario());
+        existing.setPersonal(servicio.getPersonal());
         if (servicio.getChecklist() != null && !servicio.getChecklist().isBlank()) {
             existing.setChecklist(servicio.getChecklist());
         }
@@ -237,7 +238,7 @@ public class ServicioServiceImpl implements ServicioService {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Servicio", id));
         if (usuarioActual.esSoloPersonal()) {
-            if (!servicio.getUsuario().getLogin().equals(usuarioActual.login())) {
+            if (!servicio.getPersonal().getLogin().equals(usuarioActual.login())) {
                 throw new ReglaNegocioException("El servicio no esta asignado a usted.", HttpStatus.FORBIDDEN);
             }
         } else {
@@ -292,7 +293,7 @@ public class ServicioServiceImpl implements ServicioService {
         }
 
         // Solo se asigna personal operativo ACTIVO (US09)
-        Integer idUsuario = servicio.getUsuario().getIdusuario();
+        Integer idUsuario = servicio.getPersonal().getIdusuario();
         Usuario personal = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario", idUsuario));
         boolean esPersonal = personal.getRoles().stream().anyMatch(r -> "PERSONAL".equalsIgnoreCase(r.getNombre()));
@@ -304,7 +305,7 @@ public class ServicioServiceImpl implements ServicioService {
             throw new ReglaNegocioException("No se puede asignar el servicio: " + personal.getNombres()
                     + " esta INACTIVO.");
         }
-        servicio.setUsuario(personal);
+        servicio.setPersonal(personal);
 
         if (servicio.getChecklist() != null && !servicio.getChecklist().isBlank()) {
             servicio.setChecklist(escribir(leer(servicio.getChecklist())));

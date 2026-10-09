@@ -50,6 +50,7 @@ public class AlojamientoServiceImpl implements AlojamientoService {
     @Override
     @Transactional
     public Alojamiento save(Alojamiento alojamiento) {
+        usuarioActual.verificarRegistrante(alojamiento.getIdUsuario());
         alojamiento.setIdAlojamiento(null);
         alojamiento.setPropietario(resolverPropietario(alojamiento.getPropietario()));
         if (alojamiento.getEstado() == null || alojamiento.getEstado().isBlank()) {
@@ -93,6 +94,16 @@ public class AlojamientoServiceImpl implements AlojamientoService {
                     usuarioActual.usuario().getIdusuario());
         }
         return alojamientoRepository.findByEstado(estado);
+    }
+
+    /** El propietario confirma las coordenadas sugeridas antes de guardarlas (US04). */
+    @Override
+    @Transactional
+    public Alojamiento confirmarUbicacion(Integer id, Double latitud, Double longitud) {
+        Alojamiento alojamiento = obtener(id);
+        alojamiento.setLatitud(latitud);
+        alojamiento.setLongitud(longitud);
+        return alojamientoRepository.save(alojamiento);
     }
 
     private Alojamiento obtener(Integer id) {

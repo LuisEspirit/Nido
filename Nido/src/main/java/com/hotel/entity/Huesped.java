@@ -35,6 +35,10 @@ public class Huesped {
     @Column(length = 45)
     private String telefono;
 
+    /** Usuario que registra el dato (auditoria de registro). Debe ser el usuario que inicio sesion. */
+    @Column(name = "idUsuario", updatable = false)
+    private Integer idUsuario;
+
     @NotNull(message = "Debe indicar si el huesped otorgo su consentimiento")
     private Boolean consentimiento;
 }

@@ -1,5 +1,6 @@
 package com.hotel.controller;
 
+import com.hotel.dto.UbicacionRequest;
 import com.hotel.entity.Alojamiento;
 import com.hotel.exception.RecursoNoEncontradoException;
 import com.hotel.service.AlojamientoService;
@@ -41,6 +42,13 @@ public class AlojamientoController {
     @PutMapping("/{id}")
     public ResponseEntity<Alojamiento> actualizar(@PathVariable Integer id, @Valid @RequestBody Alojamiento alojamiento) {
         return new ResponseEntity<>(alojamientoService.update(id, alojamiento), HttpStatus.OK);
+    }
+
+    /** Confirma la latitud y longitud del alojamiento (US04). Ejemplo: {"latitud": -12.1322, "longitud": -77.0302} */
+    @PatchMapping("/{id}/ubicacion")
+    public ResponseEntity<Alojamiento> confirmarUbicacion(@PathVariable Integer id,
+                                                         @Valid @RequestBody UbicacionRequest request) {
+        return ResponseEntity.ok(alojamientoService.confirmarUbicacion(id, request.latitud(), request.longitud()));
     }
 
     @DeleteMapping("/{id}")

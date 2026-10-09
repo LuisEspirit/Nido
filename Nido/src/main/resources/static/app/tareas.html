@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mis tareas · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US10 aceptar/rechazar · US11 Ejecutar checklist · US12 Adjuntar evidencias · US13 Registrar incidencias (vista movil del personal) -->
+<body>
+<div class="movil">
+  <header class="movil-cab">
+    <div class="fila" style="justify-content:space-between"><img src="/img/logo-isotipo-claro.svg" alt="Nido" style="width:36px;height:36px">
+      <button class="btn btn-fantasma btn-icono" id="salir" style="color:#fff" aria-label="Cerrar sesión"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="logout"></svg></button></div>
+    <h1 id="saludo" style="margin-top:16px">Hola</h1><p style="margin:4px 0 0;color:#CFE5EA" id="resumen"></p>
+  </header>
+  <main class="movil-cuerpo" id="vista"></main>
+</div>
+<nav class="nav-inferior" aria-label="Navegación del personal">
+  <a href="#hoy" data-v="hoy" class="activo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="home"></svg>Hoy</a><a href="#tareas" data-v="tareas"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="list"></svg>Tareas</a>
+  <a href="#incidencias" data-v="incidencias"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="alert"></svg>Incidencias</a><a href="#perfil" data-v="perfil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="user"></svg>Perfil</a>
+</nav>
+<button class="fab" id="fab" aria-label="Tomar foto de evidencia"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="camera"></svg></button>
+<input type="file" id="archivo" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
+<script src="/js/nido.js"></script>
+<script>
+Nido.pintarIconos();
+if (!Nido.requerirSesion()) throw new Error("sin sesion");
+const u = Nido.usuario(), vista = document.getElementById("vista");
+let servicios = [], actual = null;
+document.getElementById("saludo").textContent = "Hola, " + u.nombres.split(" ")[0];
+document.getElementById("salir").onclick = Nido.cerrarSesion;
+const ACCIONES = { ASIGNADO: [["ACEPTADO", "Aceptar", "btn-primario"], ["RECHAZADO", "Rechazar", "btn-secundario"]], ACEPTADO: [["EN_PROCESO", "Iniciar servicio", "btn-primario"]], EN_PROCESO: [["COMPLETADO", "Completar servicio", "btn-acento"]] };
+const lista = s => JSON.parse(s.checklist || "[]");
+function tarjeta(s) {
+  const l = lista(s), hechos = l.filter(i => i.hecho).length;
+  return `<article class="card tarea"><div class="fila" style="justify-content:space-between">${Nido.badge(s.estado)}<span class="caption">${Nido.fechaCorta(s.inicio)} · ${Nido.hora(s.inicio)}${s.fin ? " – " + Nido.hora(s.fin) : ""}</span></div>
+    <strong style="font:600 17px var(--f-titulo)">${Nido.esc(Nido.titulo(s.tipo))} · ${Nido.esc(s.alojamiento.nombre)}</strong>
+    <span class="caption" style="display:flex;gap:4px">${Nido.icono("map", "ico-16")}${Nido.esc(s.alojamiento.direccion)}</span>
+    <div class="barra" aria-label="Checklist ${hechos} de ${l.length}"><span style="width:${l.length ? hechos * 100 / l.length : 0}%"></span></div>
+    <span class="caption">Checklist ${hechos}/${l.length}</span>
+    <button class="btn btn-secundario" data-abrir="${s.idServicio}">Ver detalle</button></article>`;
+}
+async function cargar() {
+  servicios = await Nido.get("/servicios/mis-servicios");
+  const activos = servicios.filter(s => !["COMPLETADO", "CANCELADO", "RECHAZADO"].includes(s.estado));
+  document.getElementById("resumen").textContent = `${activos.length} tarea(s) pendiente(s)`;
+  mostrar(location.hash.slice(1) || "hoy");
+}
+function mostrar(v) {
+  document.querySelectorAll(".nav-inferior a").forEach(a => a.classList.toggle("activo", a.dataset.v === v));
+  document.getElementById("fab").style.display = actual && actual.estado === "EN_PROCESO" ? "grid" : "none";
+  const hoy = Nido.hoyISO();
+  if (v === "hoy" || v === "tareas") {
+    const sel = servicios.filter(s => v === "tareas" ? !["CANCELADO"].includes(s.estado) : (s.inicio.startsWith(hoy) || ["ACEPTADO", "EN_PROCESO", "ASIGNADO"].includes(s.estado)))
+      .sort((a, b) => a.inicio.localeCompare(b.inicio));
+    vista.innerHTML = `<h2 style="font-size:18px;margin-top:28px">${v === "hoy" ? "Tareas de hoy y pendientes" : "Todas mis tareas"}</h2>` +
+      (sel.map(tarjeta).join("") || `<div class="card">${Nido.vacio("ok", "Estás al día", "No tienes tareas pendientes.")}</div>`);
+  } else if (v === "incidencias") formularioIncidencia();
+  else if (v === "perfil") vista.innerHTML = `<div class="card card-pad" style="margin-top:28px"><div class="fila"><div class="avatar">${Nido.esc(u.nombres[0])}</div><div><strong>${Nido.esc(u.nombres)}</strong><div class="caption">${Nido.esc(u.login)} · Personal operativo</div></div></div>
+    <button class="btn btn-secundario" style="width:100%;margin-top:16px" onclick="Nido.cerrarSesion()">Cerrar sesión</button></div>`;
+}
+async function detalle(id) {
+  actual = servicios.find(s => s.idServicio == id);
+  const s = actual, l = lista(s), editable = s.estado === "EN_PROCESO";
+  const evid = await Nido.get(`/servicios/${s.idServicio}/evidencias`);
+  vista.innerHTML = `<div class="card card-pad" style="margin-top:28px;display:flex;flex-direction:column;gap:12px">
+    <button class="btn btn-fantasma btn-sm" style="align-self:flex-start" id="volver">${Nido.icono("left", "ico-16")}Volver</button>
+    <div class="fila" style="justify-content:space-between">${Nido.badge(s.estado)}<span class="caption">${Nido.fechaCorta(s.inicio)} · ${Nido.hora(s.inicio)}</span></div>
+    <h2 style="font-size:20px">${Nido.esc(Nido.titulo(s.tipo))} · ${Nido.esc(s.alojamiento.nombre)}</h2>
+    <h3 style="font-size:16px">Checklist</h3>
+    ${editable ? "" : `<div class="alerta a-info">${Nido.icono("info")}<div>Inicia el servicio para marcar el checklist y subir fotos.</div></div>`}
+    <div class="checklist">${l.map((i, n) => `<label class="check-item ${i.hecho ? "hecho" : ""}"><input type="checkbox" data-item="${n}" ${i.hecho ? "checked" : ""} ${editable ? "" : "disabled"}><span>${Nido.esc(i.item)}</span>${i.obligatorio ? '<span class="badge b-primario oblig">Obligatorio</span>' : ""}</label>`).join("")}</div>
+    <h3 style="font-size:16px">Fotos de evidencia (${evid.length})</h3>
+    <div class="fotos" id="fotos">${evid.length ? "" : '<span class="caption">Sube al menos una foto antes de completar.</span>'}</div>
+    ${editable ? `<button class="btn btn-secundario" id="subir">${Nido.icono("camera")}Tomar o subir foto</button>` : ""}
+    <div class="pila" style="gap:8px">${(ACCIONES[s.estado] || []).map(([e, t, c]) => `<button class="btn ${c}" data-estado="${e}" style="min-height:48px">${t}</button>`).join("")}</div></div>`;
+  document.getElementById("fab").style.display = editable ? "grid" : "none";
+  document.getElementById("volver").onclick = () => { actual = null; mostrar("hoy"); };
+  document.getElementById("subir")?.addEventListener("click", () => document.getElementById("archivo").click());
+  for (const ev of evid) { const img = document.createElement("img"); img.alt = ev.nombreArchivo; img.src = await Nido.imagen(`/evidencias/${ev.idEvidencia}/archivo`); document.getElementById("fotos").appendChild(img); }
+}
+vista.addEventListener("click", async e => {
+  const ab = e.target.closest("[data-abrir]"), es = e.target.closest("[data-estado]");
+  if (ab) detalle(ab.dataset.abrir);
+  if (es) {
+    try { actual = await Nido.patch(`/servicios/${actual.idServicio}/estado`, { estado: es.dataset.estado });
+      Nido.toast("exito", "Servicio " + Nido.titulo(es.dataset.estado).toLowerCase(), actual.alojamiento.nombre);
+      servicios = servicios.map(s => s.idServicio === actual.idServicio ? actual : s); detalle(actual.idServicio); }
+    catch (err) { Nido.toast("advertencia", "Aún no se puede", err.mensaje); }
+  }
+});
+vista.addEventListener("change", async e => {
+  const c = e.target.closest("[data-item]"); if (!c) return;
+  const items = lista(actual).map((i, n) => ({ item: i.item, hecho: n == c.dataset.item ? c.checked : i.hecho }));
+  try { actual = await Nido.patch(`/servicios/${actual.idServicio}/checklist`, items); servicios = servicios.map(s => s.idServicio === actual.idServicio ? actual : s);
+    c.closest(".check-item").classList.toggle("hecho", c.checked); }
+  catch (err) { c.checked = !c.checked; Nido.toast("error", "No se guardó el checklist", err.mensaje); }
+});
+document.getElementById("fab").onclick = () => document.getElementById("archivo").click();
+document.getElementById("archivo").onchange = async e => {
+  const f = e.target.files[0]; if (!f || !actual) return;
+  const datos = new FormData(); datos.append("idUsuario", u.idusuario); datos.append("archivo", f);
+  try { await Nido.api("POST", `/servicios/${actual.idServicio}/evidencias`, datos); Nido.toast("exito", "Foto guardada", "La evidencia quedó registrada con tu nombre y la hora."); detalle(actual.idServicio); }
+  catch (err) { Nido.toast("error", "No se pudo subir la foto", err.mensaje); }
+  e.target.value = "";
+};
+function formularioIncidencia() {
+  const alojs = [...new Map(servicios.map(s => [s.alojamiento.idAlojamiento, s.alojamiento])).values()];
+  vista.innerHTML = `<form id="f-inc" class="card card-pad" style="margin-top:28px;display:flex;flex-direction:column;gap:14px" novalidate>
+    <h2 style="font-size:20px">Reportar incidencia</h2>
+    <div class="campo"><label for="i-aloj">Alojamiento <span class="req">*</span></label><select class="input" id="i-aloj" required>${alojs.map(a => `<option value="${a.idAlojamiento}">${Nido.esc(a.nombre)}</option>`).join("")}</select></div>
+    <div class="campo"><label for="i-cat">Categoría <span class="req">*</span></label><select class="input" id="i-cat"><option>LIMPIEZA</option><option>MANTENIMIENTO</option><option>DANO</option><option>SEGURIDAD</option><option>OTRO</option></select></div>
+    <div class="campo"><label for="i-pri">Prioridad <span class="req">*</span></label><select class="input" id="i-pri"><option>BAJA</option><option selected>MEDIA</option><option>ALTA</option><option>CRITICA</option></select></div>
+    <div class="campo"><label for="i-desc">Descripción <span class="req">*</span></label><textarea class="input" id="i-desc" required data-error="Describe el problema."></textarea><span class="error-campo"></span></div>
+    <button class="btn btn-primario" style="min-height:48px">Enviar incidencia</button></form>`;
+  const f = document.getElementById("f-inc"); Nido.prepararFormulario(f);
+  f.onsubmit = async ev => { ev.preventDefault(); if (!Nido.formularioValido(f)) return;
+    try { await Nido.post("/incidencias", { idUsuario: u.idusuario, categoria: f["i-cat"].value, prioridad: f["i-pri"].value, descripcion: f["i-desc"].value.trim(), alojamiento: { idAlojamiento: Number(f["i-aloj"].value) } });
+      Nido.toast("exito", "Incidencia registrada", "Quedó ABIERTA y el propietario ya la ve."); f.reset(); }
+    catch (err) { Nido.mostrarErroresApi(f, err); } };
+}
+document.querySelectorAll(".nav-inferior a").forEach(a => a.onclick = () => { actual = null; setTimeout(() => mostrar(a.dataset.v)); });
+cargar().catch(e => Nido.toast("error", "No pudimos cargar tus tareas", e.mensaje));
+</script>
+</body>
+</html>

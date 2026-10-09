@@ -114,6 +114,7 @@ sudo journalctl -u nido -f      # esperar "Started NidoApplication"
 
 ## 7. Verificar
 
+- Aplicación web: `http://IP_PUBLICA_EC2:8080/` (pantalla de login; usuarios de prueba con contraseña `Nido2026!`)
 - Swagger: `http://IP_PUBLICA_EC2:8080/swagger-ui.html`
 - Login:
   ```bash
@@ -122,6 +123,17 @@ sudo journalctl -u nido -f      # esperar "Started NidoApplication"
   ```
 - Postman: en la colección cambie la variable `baseUrl` a `http://IP_PUBLICA_EC2:8080/api/v1`
   y ejecute el Runner (con la base recién cargada).
+
+## 8. Después de desplegar (para la rúbrica)
+
+1. **Landing:** en el repositorio `nido-landing`, edita `js/config.js` y cambia `NIDO_APP_URL` por
+   `http://IP_PUBLICA_EC2:8080/login.html`. Así el botón "Iniciar sesión" de la landing abre la app en AWS.
+2. **Evidencias para el documento (sección 4.2.2.5):**
+   - Consola de AWS con la instancia EC2 *Running* y la base RDS *Available*.
+   - `sudo systemctl status nido` mostrando *active (running)*.
+   - Postman o el navegador llamando a `http://IP_PUBLICA_EC2:8080/api/v1/auth/login`.
+   - Las variables de entorno **sin mostrar contraseñas**.
+3. **Notion:** pasa la tarea WI-21 "Despliegue en AWS" a *Hecho*.
 
 ## Actualizar a una nueva versión
 

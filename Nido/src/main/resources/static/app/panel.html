@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- Panel del propietario: resumen de US06, US08, US13 y US14 -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1 id="saludo">Panel</h1><p>Resumen de tu operación de este mes.</p></div>
+        <div class="fila"><a class="btn btn-secundario" href="/app/calendario.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="calendar"></svg>Ver calendario</a>
+        <a class="btn btn-primario" href="/app/reservas.html?nueva=1"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Nueva reserva</a></div></div>
+      <section class="kpis" id="kpis" aria-label="Indicadores del mes"></section>
+      <div class="dos-col">
+        <div class="pila">
+          <section class="card card-pad"><div class="panel-titulo"><h3>Llegadas y salidas de hoy</h3><span class="caption" id="hoy"></span></div><div id="hoy-lista"></div></section>
+          <section class="card card-pad"><div class="panel-titulo"><h3>Próximas reservas</h3><a class="btn btn-fantasma btn-sm" href="/app/reservas.html">Ver todas</a></div>
+            <div class="tabla-wrap"><table class="tabla"><thead><tr><th>Huésped</th><th>Alojamiento</th><th>Entrada</th><th>Salida</th><th>Canal</th><th>Estado</th></tr></thead><tbody id="proximas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+        </div>
+        <div class="pila">
+          <section class="card card-pad"><div class="panel-titulo"><h3>Incidencias abiertas</h3><a class="btn btn-fantasma btn-sm" href="/app/incidencias.html">Bandeja</a></div><div id="incidencias" class="pila" style="gap:12px"></div></section>
+          <section class="card card-pad"><div class="panel-titulo"><h3>Servicios pendientes</h3><a class="btn btn-fantasma btn-sm" href="/app/servicios.html">Ver</a></div><div id="servicios" class="pila" style="gap:12px"></div></section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("panel.html");
+
+const u = Nido.usuario();
+document.getElementById("saludo").textContent = "Hola, " + u.nombres.split(" ")[0];
+document.getElementById("hoy").textContent = new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" });
+const { desde, hasta } = Nido.mesActual();
+(async () => {
+  try {
+    const [ing, ocu, reservas, incid, servicios] = await Promise.all([
+      Nido.get(`/reportes/ingresos?fechaInicio=${desde}&fechaFin=${hasta}`),
+      Nido.get(`/reportes/ocupacion?fechaInicio=${desde}&fechaFin=${hasta}`),
+      Nido.get("/reservas"), Nido.get("/incidencias?estado=ABIERTA"), Nido.get("/servicios")]);
+    const activas = reservas.filter(r => ["CONFIRMADA", "PENDIENTE", "EN_CURSO"].includes(r.estado));
+    document.getElementById("kpis").innerHTML = [
+      ["dollar", "Ingresos del mes", Nido.moneda(ing.totalIngresos), "Neto " + Nido.moneda(ing.neto)],
+      ["chart", "Ocupación promedio", ocu.ocupacionPromedio + " %", ocu.porAlojamiento.length + " alojamientos activos"],
+      ["calendar", "Reservas activas", activas.length, reservas.length + " registradas"],
+      ["alert", "Incidencias abiertas", incid.length, incid.filter(i => ["ALTA", "CRITICA"].includes(i.prioridad)).length + " de prioridad alta o crítica"]
+    ].map(([ico, et, v, d]) => `<div class="card kpi"><div class="etiqueta">${Nido.icono(ico, "ico-16")}${et}</div><div class="valor">${v}</div><div class="detalle">${d}</div></div>`).join("");
+
+    const hoy = Nido.hoyISO();
+    const mov = reservas.filter(r => r.estado !== "CANCELADA" && (r.entrada.startsWith(hoy) || r.salida.startsWith(hoy)));
+    document.getElementById("hoy-lista").innerHTML = mov.length ? mov.map(r => {
+      const llega = r.entrada.startsWith(hoy);
+      return `<div class="fila" style="justify-content:space-between;padding:10px 0;border-bottom:1px solid #EDF0F2">
+        <div class="fila">${Nido.icono(llega ? "login" : "logout")}<div><strong>${Nido.esc(r.huesped.nombres + " " + r.huesped.apellidos)}</strong><div class="caption">${Nido.esc(r.alojamiento.nombre)}</div></div></div>
+        <span class="badge ${llega ? "b-info" : "b-neutro"}">${llega ? "Check-in" : "Check-out"} ${Nido.hora(llega ? r.entrada : r.salida)}</span></div>`; }).join("")
+      : Nido.vacio("calendar", "Sin movimientos hoy", "No hay llegadas ni salidas programadas.");
+
+    const prox = activas.filter(r => r.salida >= hoy).sort((a, b) => a.entrada.localeCompare(b.entrada)).slice(0, 6);
+    document.getElementById("proximas").innerHTML = prox.length ? prox.map(r => `<tr><td>${Nido.esc(r.huesped.nombres + " " + r.huesped.apellidos)}</td>
+      <td>${Nido.esc(r.alojamiento.nombre)}</td><td>${Nido.fechaHora(r.entrada)}</td><td>${Nido.fechaHora(r.salida)}</td><td>${Nido.esc(r.canal || "—")}</td><td>${Nido.badge(r.estado)}</td></tr>`).join("")
+      : `<tr><td colspan="6">${Nido.vacio("calendar", "Aún no tienes reservas próximas", "Registra una reserva para empezar.")}</td></tr>`;
+
+    document.getElementById("incidencias").innerHTML = incid.slice(0, 4).map(i => `<div class="fila" style="justify-content:space-between;align-items:flex-start">
+      <div><strong>${Nido.esc(Nido.titulo(i.categoria))}</strong><div class="caption">${Nido.esc(i.alojamiento.nombre)} · ${Nido.esc(i.descripcion)}</div></div>${Nido.badge(i.prioridad)}</div>`).join("")
+      || Nido.vacio("ok", "Todo en orden", "No hay incidencias abiertas.");
+
+    const pend = servicios.filter(s => ["PENDIENTE", "ASIGNADO", "ACEPTADO", "EN_PROCESO"].includes(s.estado)).sort((a, b) => a.inicio.localeCompare(b.inicio)).slice(0, 4);
+    document.getElementById("servicios").innerHTML = pend.map(s => `<div class="fila" style="justify-content:space-between;align-items:flex-start">
+      <div><strong>${Nido.esc(Nido.titulo(s.tipo))} · ${Nido.esc(s.alojamiento.nombre)}</strong><div class="caption">${Nido.fechaHora(s.inicio)} · ${Nido.esc(s.personal.nombres)}</div></div>${Nido.badge(s.estado)}</div>`).join("")
+      || Nido.vacio("ok", "Sin servicios pendientes", "Todo el trabajo programado está al día.");
+  } catch (e) { Nido.toast("error", "No pudimos cargar el panel", e.mensaje); }
+})();
+
+</script>
+</body>
+</html>

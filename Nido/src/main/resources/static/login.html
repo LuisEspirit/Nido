@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar sesión · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+  <style>
+    .login { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+    .login-arte { background: var(--primario); color: #fff; padding: 56px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .login-arte h2 { color: #fff; font-size: 34px; line-height: 44px; max-width: 460px; }
+    .login-arte p { color: #CFE5EA; max-width: 440px; font-size: 16px; line-height: 24px; }
+    .login-arte .circulo { position: absolute; border-radius: 50%; background: rgba(255,255,255,.06); }
+    .login-arte ul { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 12px; }
+    .login-arte li { display: flex; gap: 10px; align-items: center; color: #E6F2F4; }
+    .login-arte li .ico { color: var(--acento); }
+    .login-form { display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+    .login-caja { width: 100%; max-width: 400px; }
+    .demo { margin-top: 24px; font-size: 12px; color: var(--texto-2); }
+    .demo code { background: #EEF1F3; padding: 1px 6px; border-radius: 4px; }
+    @media (max-width: 900px) { .login { grid-template-columns: 1fr; } .login-arte { display: none; } }
+  </style>
+</head>
+<body>
+<div class="login">
+  <section class="login-arte" aria-hidden="true">
+    <div class="circulo" style="width:420px;height:420px;right:-140px;top:-120px"></div>
+    <div class="circulo" style="width:260px;height:260px;left:-80px;bottom:-60px"></div>
+    <a class="marca" href="#" style="padding:0"><img src="/img/logo-isotipo-claro.svg" alt=""><span>Nido</span></a>
+    <div>
+      <h2>Tu operación de alojamientos, en un solo lugar.</h2>
+      <p>Reservas, servicios, evidencias, incidencias e ingresos conectados para supervisar cada estadía con trazabilidad.</p>
+      <ul>
+        <li><svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Sin dobles reservas</li>
+        <li><svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Checklist y fotos de cada servicio</li>
+        <li><svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Ingresos y ocupación al día</li>
+      </ul>
+    </div>
+    <small style="color:#9FC3CC">© 2026 Nido · Lima, Perú</small>
+  </section>
+
+  <main class="login-form">
+    <div class="login-caja">
+      <img src="/img/logo-isotipo.svg" alt="Nido" style="width:56px;height:56px;margin-bottom:24px">
+      <h1>Iniciar sesión</h1>
+      <p class="muted body-l" style="margin:8px 0 24px">Ingresa con tu usuario para ver las opciones de tu rol.</p>
+      <div id="error" class="alerta a-error" role="alert" style="display:none;margin-bottom:16px"></div>
+      <!-- Los "name" coinciden con el JSON de POST /api/v1/auth/login -->
+      <form id="form-login" class="pila" style="gap:16px" novalidate>
+        <div class="campo">
+          <label for="login">Usuario <span class="req">*</span></label>
+          <input class="input" id="login" name="login" autocomplete="username" required maxlength="15" data-error="Ingresa tu usuario.">
+          <span class="error-campo"></span>
+        </div>
+        <div class="campo">
+          <label for="password">Contraseña <span class="req">*</span></label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required data-error="Ingresa tu contraseña.">
+          <span class="error-campo"></span>
+        </div>
+        <button class="btn btn-primario" type="submit" id="btn-ingresar" style="width:100%;min-height:44px">Ingresar</button>
+      </form>
+      <p class="demo">Usuarios de prueba (contraseña <code>Nido2026!</code>): <code>admin</code>, <code>lmendoza</code> (propietaria), <code>rhuaman</code> (personal).</p>
+    </div>
+  </main>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+  if (Nido.token() && Nido.usuario()) location.replace(Nido.inicio());
+  const form = document.getElementById("form-login");
+  Nido.prepararFormulario(form);
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const error = document.getElementById("error");
+    error.style.display = "none";
+    if (!Nido.formularioValido(form)) return;
+    const boton = document.getElementById("btn-ingresar");
+    boton.disabled = true; boton.textContent = "Ingresando...";
+    try {
+      const r = await Nido.api("POST", "/auth/login", { login: form.login.value.trim(), password: form.password.value }, { sinRedireccion: true });
+      Nido.guardarSesion(r.token, { idusuario: r.idusuario, login: r.login, nombres: r.nombres, roles: r.roles, opciones: r.opciones });
+      location.replace(Nido.inicio());
+    } catch (err) {
+      error.innerHTML = Nido.icono("error") + "<div><strong>No pudimos iniciar sesión</strong>" + Nido.esc(err.mensaje) + "</div>";
+      error.style.display = "flex";
+      boton.disabled = false; boton.textContent = "Ingresar";
+    }
+  });
+</script>
+</body>
+</html>

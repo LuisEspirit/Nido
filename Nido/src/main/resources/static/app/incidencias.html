@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Incidencias · Nido</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/nido.css">
+</head>
+<!-- US13 Registrar incidencias (bandeja con prioridad y cambio de estado) -->
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="contenido">
+    <header class="topbar" id="topbar"></header>
+    <main class="pagina">
+
+      <div class="cabecera"><div><h1>Incidencias</h1><p>Problemas reportados en tus alojamientos, con prioridad y seguimiento.</p></div>
+        <button class="btn btn-primario" id="btn-nuevo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg>Registrar incidencia</button></div>
+      <div class="filtros">
+        <div class="campo"><label for="f-estado">Estado</label><select class="input" id="f-estado"><option value="">Todos</option><option>ABIERTA</option><option>EN_PROCESO</option><option>RESUELTA</option><option>CERRADA</option></select></div>
+        <div class="campo"><label for="f-prioridad">Prioridad</label><select class="input" id="f-prioridad"><option value="">Todas</option><option>CRITICA</option><option>ALTA</option><option>MEDIA</option><option>BAJA</option></select></div>
+        <div class="campo"><label for="f-aloj">Alojamiento</label><select class="input" id="f-aloj"></select></div>
+      </div>
+      <section class="card card-pad"><div class="tabla-wrap"><table class="tabla">
+        <thead><tr><th>#</th><th>Categoría</th><th>Descripción</th><th>Alojamiento</th><th>Prioridad</th><th>Estado</th><th class="num">Cambiar estado</th></tr></thead>
+        <tbody id="filas"><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr><tr><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td><td><div class="esqueleto"></div></td></tr></tbody></table></div></section>
+      <div class="modal-fondo" id="modal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-titulo">
+        <form id="form" novalidate>
+        <div class="modal-cab"><h3 id="m-titulo">Registrar incidencia</h3><button type="button" class="btn btn-fantasma btn-icono" data-cerrar aria-label="Cerrar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" data-ico="x"></svg></button></div>
+        <div class="modal-cuerpo"><div class="grid-form">
+          <div class="campo c-12"><label for="alojamiento">Alojamiento <span class="req">*</span></label><select class="input" id="alojamiento" name="alojamiento.idAlojamiento" required data-error="El alojamiento es obligatorio."></select><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="categoria">Categoría <span class="req">*</span></label><select class="input" id="categoria" name="categoria" required><option>LIMPIEZA</option><option>MANTENIMIENTO</option><option>DANO</option><option>SEGURIDAD</option><option>OTRO</option></select></div>
+          <div class="campo c-6"><label for="prioridad">Prioridad <span class="req">*</span></label><select class="input" id="prioridad" name="prioridad" required><option>BAJA</option><option selected>MEDIA</option><option>ALTA</option><option>CRITICA</option></select></div>
+          <div class="campo c-12"><label for="descripcion">Descripción <span class="req">*</span></label><textarea class="input" id="descripcion" name="descripcion" required data-error="La descripción es obligatoria."></textarea><span class="error-campo"></span></div>
+          <div class="campo c-6"><label for="reserva">Reserva relacionada</label><select class="input" id="reserva" name="reserva.idReserva"></select><span class="ayuda">Opcional</span></div>
+          <div class="campo c-6"><label for="servicio">Servicio relacionado</label><select class="input" id="servicio" name="servicio.idServicio"></select><span class="ayuda">Opcional</span></div>
+          <div class="campo c-12"><label for="idUsuario">Registrado por (idUsuario)</label><input class="input" id="idUsuario" readonly><span class="ayuda">La incidencia se registra en estado ABIERTA.</span></div>
+        </div></div>
+        <div class="modal-pie"><button type="button" class="btn btn-secundario" data-cerrar>Cancelar</button><button class="btn btn-primario" type="submit">Registrar</button></div>
+        </form></div></div>
+    </main>
+  </div>
+</div>
+<script src="/js/nido.js"></script>
+<script>
+Nido.montarLayout("incidencias.html");
+
+const form = document.getElementById("form"), u = Nido.usuario();
+let incidencias = [], alojamientos = [], reservas = [], servicios = [];
+const SIG = { ABIERTA: ["EN_PROCESO", "RESUELTA"], EN_PROCESO: ["RESUELTA"], RESUELTA: ["CERRADA", "ABIERTA"], CERRADA: [] };
+Nido.prepararFormulario(form);
+document.querySelectorAll("[data-cerrar]").forEach(b => b.onclick = () => Nido.cerrarModal("modal"));
+async function cargar() {
+  const q = new URLSearchParams();
+  ["estado", "prioridad"].forEach(k => { const v = document.getElementById("f-" + k).value; if (v) q.set(k, v); });
+  const a = document.getElementById("f-aloj").value; if (a) q.set("idAlojamiento", a);
+  incidencias = await Nido.get("/incidencias?" + q);
+  const orden = { CRITICA: 0, ALTA: 1, MEDIA: 2, BAJA: 3 };
+  document.getElementById("filas").innerHTML = incidencias.sort((x, y) => orden[x.prioridad] - orden[y.prioridad]).map(i => `<tr><td>${i.idIncidencia}</td>
+    <td>${Nido.esc(Nido.titulo(i.categoria))}</td><td style="max-width:320px">${Nido.esc(i.descripcion)}</td><td>${Nido.esc(i.alojamiento.nombre)}</td>
+    <td>${Nido.badge(i.prioridad)}</td><td>${Nido.badge(i.estado)}</td>
+    <td><div class="acciones">${(SIG[i.estado] || []).map(e => `<button class="btn btn-secundario btn-sm" data-id="${i.idIncidencia}" data-estado="${e}">${Nido.titulo(e)}</button>`).join("")}</div></td></tr>`).join("")
+    || `<tr><td colspan="7">${Nido.vacio("ok", "Sin incidencias con esos filtros", "Todo en orden por aquí.")}</td></tr>`;
+}
+["f-estado", "f-prioridad", "f-aloj"].forEach(id => document.getElementById(id).onchange = cargar);
+form.alojamiento.onchange = () => {
+  const a = form.alojamiento.value;
+  Nido.llenarSelect(form.reserva, reservas.filter(r => r.alojamiento.idAlojamiento == a), r => r.idReserva, r => `#${r.idReserva} · ${r.huesped.nombres} · ${Nido.fechaCorta(r.entrada)}`, "Ninguna");
+  Nido.llenarSelect(form.servicio, servicios.filter(s => s.alojamiento.idAlojamiento == a), s => s.idServicio, s => `#${s.idServicio} · ${Nido.titulo(s.tipo)} · ${Nido.fechaCorta(s.inicio)}`, "Ninguno");
+};
+document.getElementById("btn-nuevo").onclick = () => {
+  form.reset(); form.querySelectorAll(".con-error").forEach(c => c.classList.remove("con-error"));
+  Nido.llenarSelect(form.alojamiento, alojamientos, a => a.idAlojamiento, a => a.nombre, "Selecciona un alojamiento");
+  form.alojamiento.onchange(); form.idUsuario.value = u.idusuario + " · " + u.nombres; Nido.abrirModal("modal");
+};
+document.getElementById("filas").addEventListener("click", async e => {
+  const b = e.target.closest("[data-estado]"); if (!b) return;
+  try { await Nido.patch(`/incidencias/${b.dataset.id}/estado`, { estado: b.dataset.estado }); Nido.toast("exito", "Incidencia " + Nido.titulo(b.dataset.estado).toLowerCase()); cargar(); }
+  catch (err) { Nido.toast("error", "No se pudo cambiar el estado", err.mensaje); }
+});
+form.addEventListener("submit", async e => {
+  e.preventDefault(); if (!Nido.formularioValido(form)) return;
+  const cuerpo = { idUsuario: u.idusuario, categoria: form.categoria.value, prioridad: form.prioridad.value, descripcion: form.descripcion.value.trim(),
+    alojamiento: { idAlojamiento: Number(form.alojamiento.value) }, reserva: form.reserva.value ? { idReserva: Number(form.reserva.value) } : null,
+    servicio: form.servicio.value ? { idServicio: Number(form.servicio.value) } : null };
+  try { await Nido.post("/incidencias", cuerpo); Nido.cerrarModal("modal"); Nido.toast("exito", "Incidencia registrada", "Quedó en estado ABIERTA."); cargar(); }
+  catch (err) { Nido.mostrarErroresApi(form, err); }
+});
+Promise.all([Nido.get("/alojamientos"), Nido.get("/reservas"), Nido.get("/servicios")]).then(([a, r, s]) => {
+  alojamientos = a; reservas = r; servicios = s;
+  Nido.llenarSelect(document.getElementById("f-aloj"), a, x => x.idAlojamiento, x => x.nombre, "Todos"); return cargar();
+}).catch(e => Nido.toast("error", "No pudimos cargar las incidencias", e.mensaje));
+
+</script>
+</body>
+</html>

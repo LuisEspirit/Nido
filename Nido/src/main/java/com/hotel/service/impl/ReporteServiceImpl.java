@@ -141,8 +141,8 @@ public class ReporteServiceImpl implements ReporteService {
             if (incluir(s.getAlojamiento(), idAlojamiento)) {
                 eventos.add(new CalendarioEvento("SERVICIO", s.getIdServicio(), s.getAlojamiento().getIdAlojamiento(),
                         s.getAlojamiento().getNombre(), s.getInicio(), s.getFin(), s.getEstado(),
-                        s.getTipo() + " - " + s.getUsuario().getNombres() + " "
-                                + (s.getUsuario().getApellidos() == null ? "" : s.getUsuario().getApellidos())));
+                        s.getTipo() + " - " + s.getPersonal().getNombres() + " "
+                                + (s.getPersonal().getApellidos() == null ? "" : s.getPersonal().getApellidos())));
             }
         }
         eventos.sort(Comparator.comparing(CalendarioEvento::inicio));
