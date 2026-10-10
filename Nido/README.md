@@ -56,6 +56,10 @@ header `Authorization: Bearer <token>`.
 
 - **US03** – Un propietario solo ve y opera sus propios alojamientos y lo relacionado (reservas, pagos,
   servicios, incidencias, reportes). Si lo intenta con uno ajeno recibe `403`.
+- **US03 (sin duplicados)** – Un alojamiento no se puede registrar dos veces: la dirección es única en todo el sistema
+  y un propietario no puede repetir el nombre de uno de sus alojamientos (`409`, sin distinguir mayúsculas ni espacios).
+- **US05 (sin duplicados)** – Un huésped no se registra dos veces: no se repite el correo ni la combinación de
+  nombres, apellidos y teléfono (`409`).
 - **US07** – Una reserva no puede cruzarse con otra activa del mismo alojamiento (`409`, caso CP09).
   La salida debe ser posterior a la entrada y un alojamiento `INACTIVO` no acepta reservas.
   Si no se envía precio se calcula como noches × precio base. Cancelar libera las fechas.

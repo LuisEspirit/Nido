@@ -18,6 +18,9 @@ import java.util.Optional;
 @Service
 public class AlojamientoServiceImpl implements AlojamientoService {
 
+    /** Id usado al registrar: ningun alojamiento existente tiene este valor. */
+    private static final Integer SIN_ID = -1;
+
     private final AlojamientoRepository alojamientoRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioActual usuarioActual;
@@ -53,6 +56,7 @@ public class AlojamientoServiceImpl implements AlojamientoService {
         usuarioActual.verificarRegistrante(alojamiento.getIdUsuario());
         alojamiento.setIdAlojamiento(null);
         alojamiento.setPropietario(resolverPropietario(alojamiento.getPropietario()));
+        validarSinDuplicados(alojamiento, alojamiento.getPropietario(), SIN_ID);
         if (alojamiento.getEstado() == null || alojamiento.getEstado().isBlank()) {
             alojamiento.setEstado("DISPONIBLE");
         }
@@ -63,6 +67,12 @@ public class AlojamientoServiceImpl implements AlojamientoService {
     @Transactional
     public Alojamiento update(Integer id, Alojamiento alojamiento) {
         Alojamiento existing = obtener(id);
+        // Se valida antes de modificar nada: el propietario final es el actual, salvo que el administrador lo cambie
+        Usuario propietarioFinal = existing.getPropietario();
+        if (!usuarioActual.esSoloPropietario() && alojamiento.getPropietario() != null) {
+            propietarioFinal = resolverPropietario(alojamiento.getPropietario());
+        }
+        validarSinDuplicados(alojamiento, propietarioFinal, id);
         existing.setNombre(alojamiento.getNombre());
         existing.setDireccion(alojamiento.getDireccion());
         existing.setLatitud(alojamiento.getLatitud());
@@ -73,9 +83,7 @@ public class AlojamientoServiceImpl implements AlojamientoService {
             existing.setEstado(alojamiento.getEstado());
         }
         // Un propietario no puede transferir su alojamiento; el administrador si puede
-        if (!usuarioActual.esSoloPropietario() && alojamiento.getPropietario() != null) {
-            existing.setPropietario(resolverPropietario(alojamiento.getPropietario()));
-        }
+        existing.setPropietario(propietarioFinal);
         existing.setUbigeo(alojamiento.getUbigeo());
         return alojamientoRepository.save(existing);
     }
@@ -104,6 +112,27 @@ public class AlojamientoServiceImpl implements AlojamientoService {
         alojamiento.setLatitud(latitud);
         alojamiento.setLongitud(longitud);
         return alojamientoRepository.save(alojamiento);
+    }
+
+    /**
+     * Un alojamiento no se puede registrar dos veces: la direccion es unica en todo el sistema y
+     * un propietario no puede tener dos alojamientos con el mismo nombre. Si ya existe, responde 409.
+     */
+    private void validarSinDuplicados(Alojamiento alojamiento, Usuario propietario, Integer idActual) {
+        if (alojamiento.getDireccion() != null && !alojamiento.getDireccion().isBlank()) {
+            alojamientoRepository.buscarPorDireccion(alojamiento.getDireccion(), idActual).stream().findFirst()
+                    .ifPresent(a -> {
+                        throw new ReglaNegocioException("Ya existe un alojamiento registrado en la direccion '"
+                                + alojamiento.getDireccion().trim() + "' (id " + a.getIdAlojamiento() + ").");
+                    });
+        }
+        if (alojamiento.getNombre() != null && !alojamiento.getNombre().isBlank() && propietario != null) {
+            alojamientoRepository.buscarPorNombreDelPropietario(alojamiento.getNombre(), propietario.getIdusuario(),
+                    idActual).stream().findFirst().ifPresent(a -> {
+                        throw new ReglaNegocioException("Ya tiene un alojamiento llamado '"
+                                + alojamiento.getNombre().trim() + "' (id " + a.getIdAlojamiento() + ").");
+                    });
+        }
     }
 
     private Alojamiento obtener(Integer id) {
