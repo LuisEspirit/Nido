@@ -2,6 +2,7 @@ package com.hotel.service.impl;
 
 import com.hotel.entity.Huesped;
 import com.hotel.exception.RecursoNoEncontradoException;
+import com.hotel.exception.ReglaNegocioException;
 import com.hotel.repository.HuespedRepository;
 import com.hotel.security.UsuarioActual;
 import com.hotel.service.HuespedService;
@@ -13,6 +14,9 @@ import java.util.Optional;
 
 @Service
 public class HuespedServiceImpl implements HuespedService {
+
+    /** Id usado al registrar: ningun huesped existente tiene este valor. */
+    private static final Integer SIN_ID = -1;
 
     private final HuespedRepository huespedRepository;
     private final UsuarioActual usuarioActual;
@@ -39,6 +43,7 @@ public class HuespedServiceImpl implements HuespedService {
     public Huesped save(Huesped huesped) {
         usuarioActual.verificarRegistrante(huesped.getIdUsuario());
         huesped.setIdHuesped(null);
+        validarSinDuplicados(huesped, SIN_ID);
         return huespedRepository.save(huesped);
     }
 
@@ -46,6 +51,7 @@ public class HuespedServiceImpl implements HuespedService {
     @Transactional
     public Huesped update(Integer id, Huesped huesped) {
         return huespedRepository.findById(id).map(existing -> {
+            validarSinDuplicados(huesped, id);
             existing.setNombres(huesped.getNombres());
             existing.setApellidos(huesped.getApellidos());
             existing.setCorreo(huesped.getCorreo());
@@ -61,4 +67,28 @@ public class HuespedServiceImpl implements HuespedService {
         huespedRepository.delete(huespedRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Huesped", id)));
     }
-}
+
+    /**
+     * Un huesped no se puede registrar dos veces: no puede repetirse el correo, ni la combinacion
+     * de nombres, apellidos y telefono. Si ya existe, responde 409.
+     */
+    private void validarSinDuplicados(Huesped huesped, Integer idActual) {
+        String correo = huesped.getCorreo() == null ? "" : huesped.getCorreo().trim();
+        if (!correo.isEmpty()) {
+            huespedRepository.findByCorreoIgnoreCaseAndIdHuespedNot(correo, idActual).stream().findFirst()
+                    .ifPresent(h -> {
+                        throw new ReglaNegocioException("Ya existe un huesped registrado con el correo '"
+                                + correo + "' (id " + h.getIdHuesped() + ").");
+                    });
+        }
+        String telefono = huesped.getTelefono() == null ? "" : huesped.getTelefono().trim();
+        if (!telefono.isEmpty() && huesped.getNombres() != null && huesped.getApellidos() != null) {
+            huespedRepository.findByNombresIgnoreCaseAndApellidosIgnoreCaseAndTelefonoAndIdHuespedNot(
+                    huesped.getNombres().trim(), huesped.getApellidos().trim(), telefono, idActual).stream()
+                    .findFirst().ifPresent(h -> {
+                        throw new ReglaNegocioException("Ya existe un huesped con los mismos nombres, apellidos y telefono (id "
+                                + h.getIdHuesped() + ").");
+                    });
+        }
+    }
+}

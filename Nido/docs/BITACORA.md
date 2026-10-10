@@ -54,6 +54,7 @@ hash con sal, así ni siquiera nosotros podemos ver la contraseña original."
 | HU | Regla | Dónde está el código |
 |---|---|---|
 | US03 | Un propietario solo ve y opera **sus** alojamientos (y sus reservas, pagos, servicios, incidencias y reportes) | `UsuarioActual.puedeVer()` / `verificarAlojamiento()`, usado en cada `ServiceImpl` |
+| US03, US05 | No se registran duplicados: dirección única (y nombre único por propietario) en alojamientos; correo único (o nombres + apellidos + teléfono) en huéspedes | `AlojamientoServiceImpl.validarSinDuplicados()` y `HuespedServiceImpl.validarSinDuplicados()` → 409 |
 | US07 | Dos reservas activas del mismo alojamiento no se pueden cruzar | `ReservaRepository.buscarSolapadas()` + `ReservaServiceImpl.prepararYValidar()` |
 | US06 | Si no se envía precio: noches × precio base; salida posterior a la entrada; alojamiento INACTIVO no reserva | `ReservaServiceImpl` |
 | US09 | Solo se asigna personal ACTIVO con rol PERSONAL | `ServicioServiceImpl.prepararYValidar()` |
@@ -121,7 +122,7 @@ usuario puede escribir las coordenadas a mano.
 
 | Tipo | Dónde | Resultado |
 |---|---|---|
-| Unitarias (JUnit 5 + Mockito) | `src/test/java/com/hotel/...` | 16 pruebas: solapamiento, fechas, precio, ciclo del servicio, checklist, evidencia, personal inactivo, idUsuario |
+| Unitarias (JUnit 5 + Mockito) | `src/test/java/com/hotel/...` | 24 pruebas: duplicados, solapamiento, fechas, precio, ciclo del servicio, checklist, evidencia, personal inactivo, idUsuario |
 | API (Postman) | `pruebas-api/Nido.postman_collection.json` | 95 peticiones en 17 carpetas (una por HU), 126 validaciones |
 | Reporte | `pruebas-api/reporte-pruebas.html` | Generado con Newman |
 
